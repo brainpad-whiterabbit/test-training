@@ -9,17 +9,20 @@ Python は `.python-version` で 3.12 系に固定しています。
 
 ```bash
 ./scripts/setup.sh
+./scripts/install-vscode-extensions.sh
 ```
 
-VS Code / Codespaces のコマンドパレットから `Tasks: Run Task` を開き、`Setup Python environment` を実行しても同じです。
+VS Code / Codespaces のコマンドパレットから `Tasks: Run Task` を開き、登録済みのタスクを実行しても同じです。
 
 ## ローカルで始める
 
 ```bash
 ./scripts/setup.sh
+./scripts/install-vscode-extensions.sh
 ```
 
 `uv` が未インストールの場合、セットアップスクリプトが公式インストーラで導入します。
+VS Code 拡張のインストールスクリプトは `.vscode/extensions.json` の `recommendations` を参照し、利用できる `code` / `code-insiders` / `code-server` コマンドで拡張を導入します。
 
 ## よく使うコマンド
 
@@ -40,6 +43,7 @@ uv run ty check
 - `src/training/`: 演習用の Python パッケージ
 - `tests/`: pytest のテスト
 - `scripts/setup.sh`: `uv` と依存関係のセットアップ
+- `scripts/install-vscode-extensions.sh`: `.vscode/extensions.json` にある推奨拡張のインストール
 - `scripts/check.sh`: テスト、lint、型チェック
 - `.vscode/`: Codespaces / VS Code 向けの推奨設定とタスク
 - `.github/workflows/ci.yml`: GitHub Actions での検証
