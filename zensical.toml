@@ -6,12 +6,7 @@ site_dir = "site"
 extra_css = ["stylesheets/extra.css"]
 nav = [
   { "はじめに" = "index.md" },
-  { "演習の進め方" = [
-    { "スプリントの流れ" = "guide/sprint-flow.md" },
-    { "成果物一覧" = "guide/deliverables.md" },
-    { "レビュー観点" = "guide/review-checkpoints.md" },
-    { "CI/CDの使い方" = "guide/cicd.md" },
-  ] },
+  { "演習の進め方" = "guide/index.md" },
   { "チュートリアルスプリント" = [
     { "Sprint 0 概要" = "sprints/sprint-0/index.md" },
     { "要件定義フェーズ" = "sprints/sprint-0/requirements.md" },
