@@ -30,6 +30,8 @@ VS Code 拡張のインストールスクリプトは `.vscode/extensions.json` 
 uv run pytest
 uv run ruff check .
 uv run ty check
+uv run zensical serve
+uv run zensical build
 ```
 
 まとめて確認する場合:
@@ -42,6 +44,8 @@ uv run ty check
 
 - `src/training/`: 演習用の Python パッケージ
 - `tests/`: pytest のテスト
+- `docs/`: Zensical で公開する演習ドキュメント
+- `zensical.toml`: Zensical のサイト設定とナビゲーション
 - `scripts/setup.sh`: `uv` と依存関係のセットアップ
 - `scripts/install-vscode-extensions.sh`: `.vscode/extensions.json` にある推奨拡張のインストール
 - `scripts/check.sh`: テスト、lint、型チェック

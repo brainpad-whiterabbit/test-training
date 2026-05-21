@@ -1,0 +1,90 @@
+[project]
+site_name = "シフトレフト演習"
+site_description = "電卓Webアプリを題材にしたシフトレフト開発演習"
+docs_dir = "docs"
+site_dir = "site"
+extra_css = ["stylesheets/extra.css"]
+nav = [
+  { "はじめに" = [
+    { "演習の目的" = "index.md" },
+    { "シフトレフト戦略の全体像" = "overview/shift-left.md" },
+    { "演習環境セットアップ" = "setup/environment.md" },
+    { "電卓Webアプリの仕様概要" = "setup/calculator-app.md" },
+  ] },
+  { "演習の進め方" = [
+    { "スプリントの流れ" = "guide/sprint-flow.md" },
+    { "成果物一覧" = "guide/deliverables.md" },
+    { "レビュー観点" = "guide/review-checkpoints.md" },
+    { "CI/CDの使い方" = "guide/cicd.md" },
+  ] },
+  { "チュートリアルスプリント" = [
+    { "Sprint 0 概要" = "sprints/sprint-0/index.md" },
+    { "要件定義フェーズ" = "sprints/sprint-0/requirements.md" },
+    { "設計フェーズ" = "sprints/sprint-0/design.md" },
+    { "開発フェーズ" = "sprints/sprint-0/development.md" },
+    { "テストフェーズ" = "sprints/sprint-0/testing.md" },
+    { "ふりかえり" = "sprints/sprint-0/retrospective.md" },
+  ] },
+  { "演習スプリント1" = [
+    { "Sprint 1 概要" = "sprints/sprint-1/index.md" },
+    { "要件レビューとテスト分析" = "sprints/sprint-1/requirements-review.md" },
+    { "設計レビューとテスト設計" = "sprints/sprint-1/design-review.md" },
+    { "実装とテスト実装" = "sprints/sprint-1/development.md" },
+    { "CI/CD確認" = "sprints/sprint-1/cicd.md" },
+    { "ユーザビリティテスト" = "sprints/sprint-1/usability-test.md" },
+    { "ふりかえり" = "sprints/sprint-1/retrospective.md" },
+  ] },
+  { "演習スプリント2" = [
+    { "Sprint 2 概要" = "sprints/sprint-2/index.md" },
+    { "要件レビューとテスト分析" = "sprints/sprint-2/requirements-review.md" },
+    { "設計レビューとテスト設計" = "sprints/sprint-2/design-review.md" },
+    { "実装とテスト実装" = "sprints/sprint-2/development.md" },
+    { "CI/CD確認" = "sprints/sprint-2/cicd.md" },
+    { "ユーザビリティテスト" = "sprints/sprint-2/usability-test.md" },
+    { "ふりかえり" = "sprints/sprint-2/retrospective.md" },
+  ] },
+  { "演習スプリント3" = [
+    { "Sprint 3 概要" = "sprints/sprint-3/index.md" },
+    { "要件レビューとテスト分析" = "sprints/sprint-3/requirements-review.md" },
+    { "設計レビューとテスト設計" = "sprints/sprint-3/design-review.md" },
+    { "実装とテスト実装" = "sprints/sprint-3/development.md" },
+    { "CI/CD確認" = "sprints/sprint-3/cicd.md" },
+    { "ユーザビリティテスト" = "sprints/sprint-3/usability-test.md" },
+    { "ふりかえり" = "sprints/sprint-3/retrospective.md" },
+  ] },
+  { "付録" = [
+    { "要件レビュー観点表" = "appendix/requirements-review-template.md" },
+    { "テスト分析テンプレート" = "appendix/test-analysis-template.md" },
+    { "設計レビュー観点表" = "appendix/design-review-template.md" },
+    { "テスト設計テンプレート" = "appendix/test-design-template.md" },
+    { "ユーザビリティテスト台本" = "appendix/usability-test-script.md" },
+    { "評価基準" = "appendix/evaluation-rubric.md" },
+  ] },
+]
+
+[project.theme]
+language = "ja"
+font.text = "Noto Sans JP"
+font.code = "JetBrains Mono"
+features = [
+  "navigation.tabs",
+  "navigation.sections",
+  "navigation.path",
+  "navigation.tracking",
+  "navigation.top",
+  "toc.follow",
+]
+
+[[project.theme.palette]]
+scheme = "default"
+primary = "teal"
+accent = "amber"
+toggle.icon = "lucide/sun"
+toggle.name = "ダークモードに切り替え"
+
+[[project.theme.palette]]
+scheme = "slate"
+primary = "teal"
+accent = "amber"
+toggle.icon = "lucide/moon"
+toggle.name = "ライトモードに切り替え"

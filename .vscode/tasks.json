@@ -16,6 +16,17 @@
         "isDefault": true
       },
       "problemMatcher": []
+    },
+    {
+      "label": "Zensical Serve",
+      "type": "shell",
+      "command": "uv run zensical serve",
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
     }
   ]
 }
