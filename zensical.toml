@@ -30,6 +30,7 @@ features = [
   "navigation.sections",
   "navigation.path",
   "navigation.tracking",
+  "navigation.footer",
   "navigation.top",
   "toc.follow",
 ]
