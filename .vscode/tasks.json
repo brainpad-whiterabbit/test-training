@@ -18,6 +18,17 @@
       "problemMatcher": []
     },
     {
+      "label": "Run Calculator App",
+      "type": "shell",
+      "command": "./scripts/run-calculator-app.sh",
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
       "label": "Doc Serve",
       "type": "shell",
       "command": "uv run zensical serve",
