@@ -43,6 +43,7 @@ Codespaces またはローカル環境でリポジトリを開き、次のコマ
 ```
 
 起動後、ブラウザで `http://localhost:8080` を開き、電卓が表示されることを確認してください。
+確認が終わったら、アプリを起動しているターミナルで `Ctrl+C` を押して終了してください。
 
 スクリプトを使わずに直接起動する場合は、次のコマンドでも確認できます。
 
@@ -55,6 +56,15 @@ PYTHONPATH=src uv run python -m training.app
 演習は [GitHub Pages](https://brainpad-whiterabbit.github.io/test-training/) に掲載されたドキュメントに沿って進めてください。
 
 ## 備考
+
+### VS Code Tasks
+
+VS Code / Codespaces では、コマンドパレットから `Tasks: Run Task` を選択すると `.vscode/tasks.json` に定義されたタスクを実行できます。
+
+- `Check`: テスト、lint、型チェックをまとめて実行します。
+- `Test`: pytest のテストを実行します。
+- `Run Calculator App`: 電卓Webアプリを起動します。終了する場合は、ターミナルで `Ctrl+C` を押すか、コマンドパレットから `Tasks: Terminate Task` を実行してください。
+- `Doc Serve`: 演習ドキュメントサイトをローカルで起動します。
 
 ### CI/CD と GitHub Pages
 
