@@ -8,6 +8,12 @@
       "problemMatcher": []
     },
     {
+      "label": "Install VS Code extensions",
+      "type": "shell",
+      "command": "./scripts/install-vscode-extensions.sh",
+      "problemMatcher": []
+    },
+    {
       "label": "Check",
       "type": "shell",
       "command": "./scripts/check.sh",
