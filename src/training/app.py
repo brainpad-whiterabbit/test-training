@@ -17,12 +17,13 @@ def format_number(value: float) -> str:
 
 
 def create_app() -> None:
-    ui.page_title("足し算電卓")
+    ui.page_title("電卓Webアプリ")
 
     with (
-        ui.column().classes("w-full min-h-screen items-center justify-center bg-white p-4"),
+        ui.column().classes("w-full min-h-screen items-center justify-center bg-zinc-50 p-4"),
         ui.card().classes(
-            "w-full max-w-md gap-3 rounded-lg bg-white p-4 shadow-xl ring-1 ring-zinc-200"
+            "w-full max-w-md gap-4 rounded-lg border border-zinc-200 bg-zinc-200 p-5 "
+            "shadow-2xl shadow-zinc-200"
         ),
     ):
         operation = OPERATIONS[DEFAULT_OPERATION_KEY]
@@ -32,10 +33,14 @@ def create_app() -> None:
             "display": "0",
         }
 
-        expression_label = ui.label("").classes("h-5 w-full text-right text-sm text-zinc-500")
+        with ui.row().classes("w-full items-center justify-between"):
+            ui.label("電卓Webアプリ").classes("text-sm font-semibold text-zinc-500")
+            expression_label = ui.label("").classes("h-5 text-right text-sm text-zinc-500")
+
         display_label = ui.label("0").classes(
-            "w-full overflow-hidden rounded-lg bg-zinc-100 px-4 py-5 text-right text-5xl "
-            "font-light text-zinc-950"
+            "w-full overflow-hidden rounded-lg border border-lime-950 bg-lime-200 px-5 py-6 "
+            "text-right text-5xl font-mono font-semibold tracking-wider text-lime-950 "
+            "shadow-inner"
         )
 
         def render() -> None:
@@ -129,4 +134,4 @@ create_app()
 
 
 if __name__ in {"__main__", "__mp_main__"}:
-    ui.run(title="足し算電卓", reload=False, port=int(os.environ.get("PORT", "8080")))
+    ui.run(title="電卓Webアプリ", reload=False, port=int(os.environ.get("PORT", "8080")))
