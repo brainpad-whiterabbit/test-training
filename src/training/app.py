@@ -1,12 +1,15 @@
+import os
+
 from nicegui import ui
 
 from training.calculator import OPERATIONS, calculate
 
 DEFAULT_OPERATION_KEY = "add"
-BUTTON_CLASS = "h-14 rounded-lg text-xl font-semibold"
-NUMBER_BUTTON_CLASS = f"{BUTTON_CLASS} bg-slate-700 text-white hover:bg-slate-600"
-ACTION_BUTTON_CLASS = f"{BUTTON_CLASS} bg-slate-500 text-white hover:bg-slate-400"
-OPERATOR_BUTTON_CLASS = f"{BUTTON_CLASS} bg-amber-500 text-white hover:bg-amber-400"
+BUTTON_CLASS = "h-14 w-full rounded-md text-xl font-semibold"
+NUMBER_BUTTON_CLASS = f"{BUTTON_CLASS} bg-slate-100 text-zinc-950 hover:bg-slate-200"
+ACTION_BUTTON_CLASS = NUMBER_BUTTON_CLASS
+OPERATOR_BUTTON_CLASS = NUMBER_BUTTON_CLASS
+INACTIVE_BUTTON_CLASS = NUMBER_BUTTON_CLASS
 
 
 def format_number(value: float) -> str:
@@ -17,8 +20,10 @@ def create_app() -> None:
     ui.page_title("足し算電卓")
 
     with (
-        ui.column().classes("w-full min-h-screen items-center justify-center bg-zinc-200 p-4"),
-        ui.card().classes("w-full max-w-sm gap-3 rounded-lg bg-zinc-950 p-4 shadow-xl"),
+        ui.column().classes("w-full min-h-screen items-center justify-center bg-white p-4"),
+        ui.card().classes(
+            "w-full max-w-md gap-3 rounded-lg bg-white p-4 shadow-xl ring-1 ring-zinc-200"
+        ),
     ):
         operation = OPERATIONS[DEFAULT_OPERATION_KEY]
         state: dict[str, float | str | None] = {
@@ -27,10 +32,10 @@ def create_app() -> None:
             "display": "0",
         }
 
-        expression_label = ui.label("").classes("h-5 w-full text-right text-sm text-zinc-400")
+        expression_label = ui.label("").classes("h-5 w-full text-right text-sm text-zinc-500")
         display_label = ui.label("0").classes(
-            "w-full overflow-hidden rounded-lg bg-zinc-900 px-4 py-5 text-right text-5xl "
-            "font-light text-white"
+            "w-full overflow-hidden rounded-lg bg-zinc-100 px-4 py-5 text-right text-5xl "
+            "font-light text-zinc-950"
         )
 
         def render() -> None:
@@ -78,28 +83,50 @@ def create_app() -> None:
             state["operator"] = None
             render()
 
-        with ui.grid(columns=4).classes("w-full gap-2"):
-            ui.button("C", on_click=clear).classes(f"{ACTION_BUTTON_CLASS} col-span-3")
-            ui.button(operation.symbol, on_click=choose_operation).classes(OPERATOR_BUTTON_CLASS)
+        buttons = [
+            ("MC", None),
+            ("MR", None),
+            ("M-", None),
+            ("M+", None),
+            ("AC", None),
+            ("CE", None),
+            ("C", clear),
+            ("±", None),
+            ("%", None),
+            ("÷", None),
+            ("7", lambda: append_digit("7")),
+            ("8", lambda: append_digit("8")),
+            ("9", lambda: append_digit("9")),
+            ("x", None),
+            ("-", None),
+            ("4", lambda: append_digit("4")),
+            ("5", lambda: append_digit("5")),
+            ("6", lambda: append_digit("6")),
+            (operation.symbol, choose_operation),
+            ("=", resolve),
+            ("1", lambda: append_digit("1")),
+            ("2", lambda: append_digit("2")),
+            ("3", lambda: append_digit("3")),
+            ("0", lambda: append_digit("0")),
+            (".", append_decimal),
+        ]
 
-            for digit in ("7", "8", "9"):
-                ui.button(digit, on_click=lambda value=digit: append_digit(value)).classes(
-                    NUMBER_BUTTON_CLASS
-                )
-            ui.button("=", on_click=resolve).classes(f"{OPERATOR_BUTTON_CLASS} row-span-4 h-full")
+        with ui.grid(columns=5).classes("w-full gap-2"):
+            for label, handler in buttons:
+                if label.isdigit() or label == ".":
+                    button_class = NUMBER_BUTTON_CLASS
+                elif handler is None:
+                    button_class = INACTIVE_BUTTON_CLASS
+                elif label in {operation.symbol, "="}:
+                    button_class = OPERATOR_BUTTON_CLASS
+                else:
+                    button_class = ACTION_BUTTON_CLASS
 
-            for digit in ("4", "5", "6", "1", "2", "3"):
-                ui.button(digit, on_click=lambda value=digit: append_digit(value)).classes(
-                    NUMBER_BUTTON_CLASS
-                )
-            ui.button("0", on_click=lambda: append_digit("0")).classes(
-                f"{NUMBER_BUTTON_CLASS} col-span-2"
-            )
-            ui.button(".", on_click=append_decimal).classes(NUMBER_BUTTON_CLASS)
+                ui.button(label, on_click=handler or (lambda: None)).classes(button_class)
 
 
 create_app()
 
 
 if __name__ in {"__main__", "__mp_main__"}:
-    ui.run(title="足し算電卓", reload=False)
+    ui.run(title="足し算電卓", reload=False, port=int(os.environ.get("PORT", "8080")))
