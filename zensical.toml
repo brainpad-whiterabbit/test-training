@@ -4,22 +4,6 @@ site_description = "電卓Webアプリを題材にしたシフトレフト開発
 docs_dir = "docs"
 site_dir = "site"
 extra_css = ["stylesheets/extra.css"]
-nav = [
-  { "はじめに" = "index.md" },
-  { "演習の進め方" = "guide.md" },
-  { "チュートリアルスプリント" = "sprints/sprint-0.md" },
-  { "演習スプリント1" = "sprints/sprint-1.md" },
-  { "演習スプリント2" = "sprints/sprint-2.md" },
-  { "演習スプリント3" = "sprints/sprint-3.md" },
-  { "付録" = [
-    { "要件レビュー観点表" = "appendix/requirements-review-template.md" },
-    { "テスト分析テンプレート" = "appendix/test-analysis-template.md" },
-    { "設計レビュー観点表" = "appendix/design-review-template.md" },
-    { "テスト設計テンプレート" = "appendix/test-design-template.md" },
-    { "ユーザビリティテスト台本" = "appendix/usability-test-script.md" },
-    { "評価基準" = "appendix/evaluation-rubric.md" },
-  ] },
-]
 
 [project.theme]
 language = "ja"
@@ -31,6 +15,7 @@ features = [
   "navigation.path",
   "navigation.tracking",
   "navigation.footer",
+  "navigation.indexes",
   "navigation.top",
   "toc.follow",
 ]
