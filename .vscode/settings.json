@@ -5,5 +5,14 @@
   "python.testing.pytestArgs": [
     "tests"
   ],
-  "ruff.nativeServer": "on"
+  "ruff.nativeServer": "on",
+  "files.exclude": {
+    "**/.mypy_cache": true,
+    "**/.pytest_cache": true,
+    "**/.ruff_cache": true,
+    "**/.uv-cache": true,
+    "**/.uv-python": true,
+    "**/.venv": true,
+    "**/__pycache__": true
+  }
 }
