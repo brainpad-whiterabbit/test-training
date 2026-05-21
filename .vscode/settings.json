@@ -13,6 +13,7 @@
     "**/.uv-cache": true,
     "**/.uv-python": true,
     "**/.venv": true,
-    "**/__pycache__": true
+    "**/__pycache__": true,
+    "**/.cache": true
   }
 }
