@@ -29,6 +29,17 @@ body {
   background:
     radial-gradient(circle at 12% 8%, var(--training-cool), transparent 28rem),
     linear-gradient(180deg, var(--training-surface), var(--md-default-bg-color) 24rem);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.md-container,
+.md-main,
+.md-main__inner,
+.md-sidebar,
+.md-content {
+  background: transparent;
 }
 
 .md-header {
