@@ -2,6 +2,8 @@
   "recommendations": [
     "charliermarsh.ruff",
     "ms-python.python",
-    "batyan-soft.fast-tasks"
+    "batyan-soft.fast-tasks",
+    "mhutchie.git-graph",
+    "usernamehw.errorlens"
   ]
 }
