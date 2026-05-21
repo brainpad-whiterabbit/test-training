@@ -40,6 +40,12 @@ uv run zensical build
 ./scripts/check.sh
 ```
 
+## GitHub Pages への公開
+
+`main` ブランチへ push すると、GitHub Actions でチェックと Zensical のビルドが実行され、成功後に GitHub Pages へデプロイされます。
+
+初回だけ、GitHub の `Settings` > `Pages` > `Build and deployment` > `Source` を `GitHub Actions` に設定してください。
+
 ## 構成
 
 - `src/training/`: 演習用の Python パッケージ
