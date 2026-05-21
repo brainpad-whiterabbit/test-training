@@ -1,5 +1,5 @@
 [project]
-site_name = "シフトレフト演習"
+site_name = "シフトレフト開発演習"
 site_description = "電卓Webアプリを題材にしたシフトレフト開発演習"
 docs_dir = "docs"
 site_dir = "site"
