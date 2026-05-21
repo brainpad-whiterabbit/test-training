@@ -1,63 +1,53 @@
-# Python Training
+# シフトレフト演習リポジトリ
 
-Python 開発演習用のリポジトリです。Python 環境と依存関係は `uv` で管理します。
-Python は `.python-version` で 3.12 系に固定しています。
+このリポジトリは、電卓Webアプリを題材にしたシフトレフト演習のためのものです。
+アジャイル開発において、テストや品質確認を後工程に寄せず、要件定義、設計、実装の各段階で確認しながら開発を進める考え方を、演習を通じて学ぶことを目的としています。
 
-## Codespaces で始める
+まずこの README に沿って [環境構築](#環境構築) と [動作確認](#動作確認) を行い、その後に [演習の進め方](#演習の進め方) に進んでください。
 
-このリポジトリには `devcontainer` を置いていません。Codespaces では GitHub の既定イメージで開き、次のコマンドで環境を作成します。
+## 環境構築
 
-```bash
-./scripts/setup.sh
-./scripts/install-vscode-extensions.sh
-```
-
-VS Code / Codespaces のコマンドパレットから `Tasks: Run Task` を開き、登録済みのタスクを実行しても同じです。
-
-## ローカルで始める
+Codespaces またはローカル環境でリポジトリを開き、次のコマンドを実行してください。
 
 ```bash
 ./scripts/setup.sh
 ./scripts/install-vscode-extensions.sh
 ```
 
-`uv` が未インストールの場合、セットアップスクリプトが公式インストーラで導入します。
-VS Code 拡張のインストールスクリプトは `.vscode/extensions.json` の `recommendations` を参照し、利用できる `code` / `code-insiders` / `code-server` コマンドで拡張を導入します。
+各スクリプトでは次の処理を行います。
 
-## よく使うコマンド
+- `scripts/setup.sh`: `uv` が未インストールの場合は公式インストーラで導入し、`uv sync --all-groups` で依存関係を準備します。
+- `scripts/install-vscode-extensions.sh`: `.vscode/extensions.json` の `recommendations` に定義された VS Code 拡張を、利用できる `code` / `code-insiders` / `code-server` コマンドで導入します。
 
-```bash
-uv run pytest
-uv run ruff check .
-uv run ty check
-uv run zensical serve
-uv run zensical build
-```
+## 動作確認
 
-まとめて確認する場合:
+環境構築が正常に完了したことを確認するため、次のコマンドを実行してください。
 
 ```bash
 ./scripts/check.sh
 ```
 
-## GitHub Pages への公開
+このスクリプトでは、テスト、lint、型チェックをまとめて実行します。
 
-`main` ブランチへ push すると、GitHub Actions でチェックと Zensical のビルドが実行され、成功後に GitHub Pages へデプロイされます。
+## 演習の進め方
 
-初回だけ、GitHub の `Settings` > `Pages` > `Build and deployment` > `Source` を `GitHub Actions` に設定してください。
+演習は [GitHub Pages](https://brainpad-whiterabbit.github.io/test-training/) に掲載されたドキュメントに沿って進めてください。
 
-## 構成
+## 備考
 
-- `src/training/`: 演習用の Python パッケージ
+### CI/CD と GitHub Pages
+
+Pull Request または `main` / `develop` ブランチへの push で CI が実行されます。
+CI では、テスト、lint、型チェック、ドキュメントビルドを確認します。
+
+`main` ブランチへの push では、CI 成功後に GitHub Pages へ演習ドキュメントをデプロイします。
+
+### このリポジトリに含まれるもの
+
+- `docs/`: シフトレフト演習の手順、スプリント、付録テンプレート
+- `src/training/`: 演習で使う Python パッケージ
 - `tests/`: pytest のテスト
-- `docs/`: Zensical で公開する演習ドキュメント
-- `zensical.toml`: Zensical のサイト設定とナビゲーション
-- `scripts/setup.sh`: `uv` と依存関係のセットアップ
-- `scripts/install-vscode-extensions.sh`: `.vscode/extensions.json` にある推奨拡張のインストール
-- `scripts/check.sh`: テスト、lint、型チェック
-- `.vscode/`: Codespaces / VS Code 向けの推奨設定とタスク
-- `.github/workflows/ci.yml`: GitHub Actions での検証
-
-## 最初の演習
-
-[src/training/calculator.py](src/training/calculator.py) の関数を変更し、[tests/test_calculator.py](tests/test_calculator.py) が通ることを確認してください。
+- `zensical.toml`: 演習ドキュメントサイトの設定
+- `scripts/`: セットアップ、VS Code 拡張導入、チェック実行の補助スクリプト
+- `.github/workflows/ci.yml`: GitHub Actions でのチェック、ドキュメントビルド、Pages デプロイ
+- `.vscode/`: VS Code / Codespaces 向けの推奨設定とタスク

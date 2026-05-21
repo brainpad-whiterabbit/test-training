@@ -18,7 +18,7 @@
       "problemMatcher": []
     },
     {
-      "label": "Zensical Serve",
+      "label": "Doc Serve",
       "type": "shell",
       "command": "uv run zensical serve",
       "isBackground": true,
