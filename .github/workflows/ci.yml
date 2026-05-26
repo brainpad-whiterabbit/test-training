@@ -109,20 +109,35 @@ jobs:
         if: always()
         shell: bash
         run: |
+          if [[ "${{ steps.audit.outcome }}" == "success" ]]; then
+            status="Passed"
+            result="No known vulnerabilities were detected."
+          else
+            status="Failed"
+            result="Known vulnerabilities were detected."
+          fi
+
           {
             echo "## Dependency security audit"
             echo
-            if [[ "${{ steps.audit.outcome }}" == "success" ]]; then
-              echo "No known vulnerabilities were detected."
-            else
-              echo "Known vulnerabilities were detected."
-            fi
+            echo "| Item | Result |"
+            echo "| --- | --- |"
+            echo "| Status | ${status} |"
+            echo "| Tool | pip-audit |"
+            echo "| Target | Installed locked dependency set |"
+            echo
+            echo "${result}"
+            echo
+            echo "<details>"
+            echo "<summary>Audit details</summary>"
             echo
             if [[ -s security-results/pip-audit.md ]]; then
               cat security-results/pip-audit.md
             else
-              echo "No audit report was generated."
+              echo "No vulnerable packages were reported."
             fi
+            echo
+            echo "</details>"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Comment audit result on PR
@@ -135,16 +150,32 @@ jobs:
             const reportPath = 'security-results/pip-audit.md';
             const report = fs.existsSync(reportPath)
               ? fs.readFileSync(reportPath, 'utf8').trim()
-              : 'No audit report was generated.';
-            const status = '${{ steps.audit.outcome }}' === 'success'
+              : '';
+            const passed = '${{ steps.audit.outcome }}' === 'success';
+            const status = passed ? 'Passed' : 'Failed';
+            const result = passed
               ? 'No known vulnerabilities were detected.'
               : 'Known vulnerabilities were detected.';
-            const body = `${marker}
-            ## Dependency security audit
-
-            ${status}
-
-            ${report}`;
+            const details = report || 'No vulnerable packages were reported.';
+            const body = [
+              marker,
+              '## Dependency security audit',
+              '',
+              '| Item | Result |',
+              '| --- | --- |',
+              `| Status | ${status} |`,
+              '| Tool | pip-audit |',
+              '| Target | Installed locked dependency set |',
+              '',
+              result,
+              '',
+              '<details>',
+              '<summary>Audit details</summary>',
+              '',
+              details,
+              '',
+              '</details>',
+            ].join('\n');
             const { owner, repo } = context.repo;
             const issue_number = context.issue.number;
             const comments = await github.paginate(github.rest.issues.listComments, {
