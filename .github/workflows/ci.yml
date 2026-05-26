@@ -48,7 +48,16 @@ jobs:
         run: uv sync --all-groups --locked
 
       - name: Run tests
-        run: uv run pytest
+        run: |
+          mkdir -p test-results
+          uv run pytest --junitxml=test-results/pytest.xml
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-report
+          path: test-results/pytest.xml
 
   build-pages:
     runs-on: ubuntu-latest
