@@ -1,14 +1,17 @@
 # シフトレフト開発演習リポジトリ
 
+[![CI](https://github.com/brainpad-whiterabbit/test-training/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/brainpad-whiterabbit/test-training/actions/workflows/ci.yml?query=branch%3Amain)
+[![Coverage](https://brainpad-whiterabbit.github.io/test-training/badges/coverage.svg)](https://github.com/brainpad-whiterabbit/test-training/actions/workflows/ci.yml?query=branch%3Amain)
+
 このリポジトリは、電卓Webアプリを題材にしたシフトレフト開発演習のためのものです。
 テストを最後のテスト工程で実施するのではなく、開発と並行して前倒しで実施するシフトレフト開発の考え方を演習を通じて学ぶことを目的としています。
 
-| スプリント期間 | 開発工程 | テスト工程 |
-|---|---|---|
-| 前半 | 要件定義 | 要件レビュー テスト分析 |
-| 前半〜中盤 | 設計 | 設計レビュー テスト設計 |
-| 中盤 | 実装 | テスト実装 |
-| 後半 | テスト | 探索的テスト |
+| スプリント期間 | 開発工程 | テスト工程              |
+| -------------- | -------- | ----------------------- |
+| 前半           | 要件定義 | 要件レビュー テスト分析 |
+| 前半〜中盤     | 設計     | 設計レビュー テスト設計 |
+| 中盤           | 実装     | テスト実装              |
+| 後半           | テスト   | 探索的テスト            |
 
 まずこの README に沿って [環境構築](#環境構築) と [動作確認](#動作確認) を行い、その後に [演習の進め方](#演習の進め方) に進んでください。
 
@@ -32,9 +35,10 @@ Codespaces またはローカル環境でリポジトリを開き、次のコマ
 
 ```bash
 ./scripts/check.sh
+PYTHONPATH=src uv run pytest
 ```
 
-このスクリプトでは、テスト、lint、型チェックをまとめて実行します。
+このスクリプトでは、lint、型チェックをまとめて実行します。
 
 電卓Webアプリの起動を確認する場合は、次のコマンドを実行してください。
 
@@ -61,17 +65,20 @@ PYTHONPATH=src uv run python -m training.app
 
 VS Code / Codespaces では、コマンドパレットから `Tasks: Run Task` を選択すると `.vscode/tasks.json` に定義されたタスクを実行できます。
 
-- `Check`: テスト、lint、型チェックをまとめて実行します。
+- `Check`: lint、型チェックをまとめて実行します。
 - `Test`: pytest のテストを実行します。
 - `Run Calculator App`: 電卓Webアプリを起動します。終了する場合は、ターミナルで `Ctrl+C` を押すか、コマンドパレットから `Tasks: Terminate Task` を実行してください。
 - `Doc Serve`: 演習ドキュメントサイトをローカルで起動します。
 
 ### CI/CD と GitHub Pages
 
-Pull Request または `main` / `develop` ブランチへの push で CI が実行されます。
-CI では、テスト、lint、型チェック、ドキュメントビルドを確認します。
+以下の表に従ってGithub ActionsのCI/CDが動作します。
 
-`main` ブランチへの push では、CI 成功後に GitHub Pages へ演習ドキュメントをデプロイします。
+| イベント     | ブランチ条件 | check    | test     | build-pages | deploy-pages |
+| ------------ | ------------ | -------- | -------- | ----------- | ------------ |
+| push         | main         | 動く     | 動く     | 動く        | 動く         |
+| push         | main 以外    | 動かない | 動かない | 動かない    | 動かない     |
+| pull_request | すべて       | 動く     | 動く     | 動かない    | 動かない     |
 
 ### このリポジトリに含まれるもの
 

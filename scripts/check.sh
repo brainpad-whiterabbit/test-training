@@ -6,4 +6,3 @@ export UV_PYTHON_INSTALL_DIR="${UV_PYTHON_INSTALL_DIR:-.uv-python}"
 
 uv run ruff check .
 uv run ty check
-uv run pytest
