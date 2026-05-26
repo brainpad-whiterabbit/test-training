@@ -8,6 +8,7 @@ __pycache__/
 *.py[cod]
 .coverage
 htmlcov/
+security-results/
 test-results/
 site/
 .DS_Store
