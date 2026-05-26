@@ -1,5 +1,8 @@
 # シフトレフト開発演習リポジトリ
 
+[![CI](https://github.com/brainpad-whiterabbit/test-training/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/brainpad-whiterabbit/test-training/actions/workflows/ci.yml?query=branch%3Amain)
+[![Coverage](https://brainpad-whiterabbit.github.io/test-training/badges/coverage.svg)](https://github.com/brainpad-whiterabbit/test-training/actions/workflows/ci.yml?query=branch%3Amain)
+
 このリポジトリは、電卓Webアプリを題材にしたシフトレフト開発演習のためのものです。
 テストを最後のテスト工程で実施するのではなく、開発と並行して前倒しで実施するシフトレフト開発の考え方を演習を通じて学ぶことを目的としています。
 

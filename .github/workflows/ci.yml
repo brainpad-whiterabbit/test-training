@@ -241,6 +241,55 @@ jobs:
       - name: Build documentation
         run: uv run zensical build
 
+      - name: Generate coverage badge
+        shell: bash
+        run: |
+          mkdir -p site/badges test-results
+          uv run pytest --cov=src --cov-report=xml:test-results/coverage.xml
+          uv run python - <<'PY'
+          import html
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+
+          line_rate = float(ET.parse("test-results/coverage.xml").getroot().attrib["line-rate"])
+          coverage = round(line_rate * 100)
+          colors = [
+              (90, "#4c1"),
+              (75, "#97ca00"),
+              (60, "#dfb317"),
+              (40, "#fe7d37"),
+              (0, "#e05d44"),
+          ]
+          color = next(hex_color for threshold, hex_color in colors if coverage >= threshold)
+          label = "coverage"
+          value = f"{coverage}%"
+          label_width = 68
+          value_width = max(46, 10 + len(value) * 7)
+          width = label_width + value_width
+          svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="20" role="img" aria-label="{html.escape(label)}: {html.escape(value)}">
+            <linearGradient id="s" x2="0" y2="100%">
+              <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+              <stop offset="1" stop-opacity=".1"/>
+            </linearGradient>
+            <clipPath id="r">
+              <rect width="{width}" height="20" rx="3" fill="#fff"/>
+            </clipPath>
+            <g clip-path="url(#r)">
+              <rect width="{label_width}" height="20" fill="#555"/>
+              <rect x="{label_width}" width="{value_width}" height="20" fill="{color}"/>
+              <rect width="{width}" height="20" fill="url(#s)"/>
+            </g>
+            <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="11">
+              <text x="{label_width / 2}" y="15" fill="#010101" fill-opacity=".3">{html.escape(label)}</text>
+              <text x="{label_width / 2}" y="14">{html.escape(label)}</text>
+              <text x="{label_width + value_width / 2}" y="15" fill="#010101" fill-opacity=".3">{html.escape(value)}</text>
+              <text x="{label_width + value_width / 2}" y="14">{html.escape(value)}</text>
+            </g>
+          </svg>
+          '''
+          Path("site/badges/coverage.svg").write_text(svg, encoding="utf-8")
+          PY
+
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
