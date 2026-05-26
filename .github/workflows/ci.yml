@@ -34,6 +34,10 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -48,16 +52,30 @@ jobs:
         run: uv sync --all-groups --locked
 
       - name: Run tests
+        shell: bash
         run: |
           mkdir -p test-results
-          uv run pytest --junitxml=test-results/pytest.xml
+          set -o pipefail
+          uv run pytest -ra --tb=short --cov=src --cov-report=term-missing --cov-report=xml:test-results/coverage.xml | tee test-results/pytest-report.txt
+
+      - name: Report coverage
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        uses: 5monkeys/cobertura-action@v14
+        with:
+          path: test-results/coverage.xml
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          show_line: true
+          show_branch: true
+          show_missing: true
 
       - name: Upload test report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: pytest-report
-          path: test-results/pytest.xml
+          path: |
+            test-results/pytest-report.txt
+            test-results/coverage.xml
 
   build-pages:
     runs-on: ubuntu-latest
