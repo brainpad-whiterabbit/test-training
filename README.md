@@ -32,9 +32,10 @@ Codespaces またはローカル環境でリポジトリを開き、次のコマ
 
 ```bash
 ./scripts/check.sh
+PYTHONPATH=src uv run pytest
 ```
 
-このスクリプトでは、テスト、lint、型チェックをまとめて実行します。
+このスクリプトでは、lint、型チェックをまとめて実行します。
 
 電卓Webアプリの起動を確認する場合は、次のコマンドを実行してください。
 
@@ -61,7 +62,7 @@ PYTHONPATH=src uv run python -m training.app
 
 VS Code / Codespaces では、コマンドパレットから `Tasks: Run Task` を選択すると `.vscode/tasks.json` に定義されたタスクを実行できます。
 
-- `Check`: テスト、lint、型チェックをまとめて実行します。
+- `Check`: lint、型チェックをまとめて実行します。
 - `Test`: pytest のテストを実行します。
 - `Run Calculator App`: 電卓Webアプリを起動します。終了する場合は、ターミナルで `Ctrl+C` を押すか、コマンドパレットから `Tasks: Terminate Task` を実行してください。
 - `Doc Serve`: 演習ドキュメントサイトをローカルで起動します。
