@@ -15,7 +15,15 @@
     }
   },
   "[markdown]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.insertSpaces": true,
+    "editor.tabSize": 4
+  },
+  "prettier.tabWidth": 4,
+  "markdownlint.config": {
+    "MD007": {
+      "indent": 4
+    }
   },
   "files.exclude": {
     "**/.mypy_cache": true,
