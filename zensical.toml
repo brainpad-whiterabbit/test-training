@@ -40,6 +40,7 @@ toggle.icon = "lucide/moon"
 toggle.name = "ライトモードに切り替え"
 
 [project.markdown_extensions.admonition]
+[project.markdown_extensions.pymdownx.details]
 [project.markdown_extensions.tables]
 [project.markdown_extensions.pymdownx.tabbed]
 alternate_style = true
