@@ -47,3 +47,10 @@ alternate_style = true
 
 [project.markdown_extensions.pymdownx.superfences]
 [project.markdown_extensions.pymdownx.tilde]
+
+[project.markdown_extensions.toc]
+permalink = true
+
+[project.markdown_extensions.toc.slugify]
+object = "pymdownx.slugs.slugify"
+kwds = { case = "lower" }
