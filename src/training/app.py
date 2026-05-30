@@ -26,7 +26,6 @@ def create_app() -> None:
             "shadow-2xl shadow-zinc-200"
         ),
     ):
-        operation = OPERATIONS[DEFAULT_OPERATION_KEY]
         state: dict[str, float | str | None] = {
             "left": None,
             "operator": None,
@@ -48,8 +47,8 @@ def create_app() -> None:
             left = state["left"]
             operator = state["operator"]
             expression_label.set_text(
-                f"{format_number(left)} {operation.symbol}"
-                if isinstance(left, float) and operator
+                f"{format_number(left)} {OPERATIONS[operator].symbol}"
+                if isinstance(left, float) and isinstance(operator, str)
                 else ""
             )
 
@@ -70,9 +69,9 @@ def create_app() -> None:
                 state["display"] = f"{display}."
             render()
 
-        def choose_operation() -> None:
+        def choose_operation(operation_key: str) -> None:
             state["left"] = float(str(state["display"]))
-            state["operator"] = DEFAULT_OPERATION_KEY
+            state["operator"] = operation_key
             state["display"] = "0"
             render()
 
@@ -89,8 +88,8 @@ def create_app() -> None:
             render()
 
         buttons = [
-            ("CE", None),
             ("C", clear),
+            ("CE", None),
             ("±", None),
             ("%", None),
             ("÷", None),
@@ -98,17 +97,17 @@ def create_app() -> None:
             ("8", lambda: append_digit("8")),
             ("9", lambda: append_digit("9")),
             ("x", None),
-            ("-", None),
+            (OPERATIONS["subtract"].symbol, lambda: choose_operation("subtract")),
             ("4", lambda: append_digit("4")),
             ("5", lambda: append_digit("5")),
             ("6", lambda: append_digit("6")),
-            (operation.symbol, choose_operation),
-            ("=", resolve),
+            (".", append_decimal),
+            (OPERATIONS["add"].symbol, lambda: choose_operation("add")),
             ("1", lambda: append_digit("1")),
             ("2", lambda: append_digit("2")),
             ("3", lambda: append_digit("3")),
             ("0", lambda: append_digit("0")),
-            (".", append_decimal),
+            ("=", resolve),
         ]
 
         with ui.grid(columns=5).classes("w-full gap-2"):
@@ -117,7 +116,7 @@ def create_app() -> None:
                     button_class = NUMBER_BUTTON_CLASS
                 elif handler is None:
                     button_class = INACTIVE_BUTTON_CLASS
-                elif label in {operation.symbol, "="}:
+                elif label in {operation.symbol for operation in OPERATIONS.values()} | {"="}:
                     button_class = OPERATOR_BUTTON_CLASS
                 else:
                     button_class = ACTION_BUTTON_CLASS
