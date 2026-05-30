@@ -89,11 +89,6 @@ def create_app() -> None:
             render()
 
         buttons = [
-            ("MC", None),
-            ("MR", None),
-            ("M-", None),
-            ("M+", None),
-            ("AC", None),
             ("CE", None),
             ("C", clear),
             ("±", None),
