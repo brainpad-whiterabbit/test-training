@@ -3,14 +3,16 @@ from typing import Protocol
 
 from nicegui import ui
 
-from training.calculator import OPERATIONS, calculate
+from training.calculator import OPERATIONS, CalculationOverflowError, DivisionByZeroError, calculate
 
 DEFAULT_OPERATION_KEY = "add"
+MAX_INTEGER_DIGITS = 6
+MAX_FRACTIONAL_DIGITS = 4
 BUTTON_CLASS = "h-14 w-full rounded-md text-xl font-semibold"
-NUMBER_BUTTON_CLASS = f"{BUTTON_CLASS} bg-slate-100 text-zinc-950 hover:bg-slate-200"
-ACTION_BUTTON_CLASS = NUMBER_BUTTON_CLASS
-OPERATOR_BUTTON_CLASS = NUMBER_BUTTON_CLASS
-INACTIVE_BUTTON_CLASS = NUMBER_BUTTON_CLASS
+NUMBER_BUTTON_COLOR = "blue"
+ACTION_BUTTON_COLOR = "grey-4"
+CLEAR_BUTTON_COLOR = "red"
+OPERATOR_BUTTON_COLOR = "orange"
 
 type CalculatorState = dict[str, float | str | None]
 
@@ -23,16 +25,31 @@ def format_number(value: float) -> str:
     return f"{value:g}"
 
 
+def format_expression(left: float, operator: str, right: str | None = None) -> str:
+    expression = f"{format_number(left)} {OPERATIONS[operator].symbol}"
+    if right is None:
+        return expression
+
+    return f"{expression} {right}"
+
+
 def append_digit(display: str, digit: str) -> str:
-    """Return the display after pressing a digit button."""
+    """数字ボタン押下後の表示値を返す。"""
     if display == "0":
         return digit
 
-    return f"{display}{digit}"
+    next_display = f"{display}{digit}"
+    integer_part, _, fractional_part = next_display.lstrip("-").partition(".")
+    if len(integer_part) > MAX_INTEGER_DIGITS:
+        return display
+    if len(fractional_part) > MAX_FRACTIONAL_DIGITS:
+        return display
+
+    return next_display
 
 
 def append_decimal(display: str) -> str:
-    """Return the display after pressing the decimal point button."""
+    """小数点ボタン押下後の表示値を返す。"""
     if "." in display:
         return display
 
@@ -40,7 +57,7 @@ def append_decimal(display: str) -> str:
 
 
 def toggle_sign(display: str) -> str:
-    """Return the display after pressing the sign toggle button."""
+    """符号反転ボタン押下後の表示値を返す。"""
     if display == "0":
         return display
     if display.startswith("-"):
@@ -55,9 +72,9 @@ def select_operation(
     display: str,
     operation_key: str,
 ) -> tuple[float | None, str | None, str]:
-    """Return calculator state after pressing an operation button."""
+    """演算子ボタン押下後の電卓状態を返す。"""
     if operator is not None and display == "0":
-        return left, operator, display
+        return left, operation_key, display
 
     return float(display), operation_key, "0"
 
@@ -67,21 +84,65 @@ def resolve_operation(
     operator: str | None,
     display: str,
 ) -> tuple[float | None, str | None, str]:
-    """Return calculator state after pressing the equals button."""
-    if left is None or operator is None:
-        return left, operator, display
+    """イコールボタン押下後の電卓状態を返す。"""
+    next_left, next_operator, next_display, _expression = resolve_operation_with_expression(
+        left,
+        operator,
+        display,
+    )
+    return next_left, next_operator, next_display
 
-    result = calculate(left, float(display), operator)
-    return None, None, format_number(result)
+
+def resolve_operation_with_expression(
+    left: float | None,
+    operator: str | None,
+    display: str,
+) -> tuple[float | None, str | None, str, str]:
+    """イコールボタン押下後の電卓状態と式表示値を返す。"""
+    if left is None or operator is None:
+        return left, operator, display, ""
+
+    try:
+        result = calculate(left, float(display), operator)
+    except DivisionByZeroError:
+        return None, None, "Error", ""
+    except CalculationOverflowError:
+        return None, None, "Overflow", ""
+
+    return None, None, format_number(result), format_expression(left, operator, display)
+
+
+def resolve_percentage_operation(
+    left: float | None,
+    operator: str | None,
+    display: str,
+) -> tuple[float | None, str | None, str]:
+    """パーセントボタン押下後の電卓状態を返す。"""
+    if left is None or operator is None:
+        return clear_state()
+
+    display_value = float(display)
+    percentage_value = (
+        left * display_value / 100 if operator in {"add", "subtract"} else display_value / 100
+    )
+    return resolve_operation(left, operator, format_number(percentage_value))
 
 
 def clear_state() -> tuple[None, None, str]:
-    """Return calculator state after pressing the clear button."""
+    """クリアボタン押下後の電卓状態を返す。"""
     return None, None, "0"
 
 
+def clear_entry(
+    left: float | None,
+    operator: str | None,
+) -> tuple[float | None, str | None, str]:
+    """入力クリアボタン押下後の電卓状態を返す。"""
+    return left, operator, "0"
+
+
 def initial_state() -> CalculatorState:
-    """Return calculator state for a newly loaded page."""
+    """ページ読み込み直後の電卓状態を返す。"""
     return {"left": None, "operator": None, "display": "0"}
 
 
@@ -90,12 +151,17 @@ def render_state(
     expression_label: TextLabel,
     state: CalculatorState,
 ) -> None:
-    """Render calculator state to the display labels."""
+    """電卓状態を表示ラベルに反映する。"""
     display_label.set_text(str(state["display"]))
+    expression = state.get("expression")
+    if isinstance(expression, str) and expression:
+        expression_label.set_text(expression)
+        return
+
     left = state["left"]
     operator = state["operator"]
     expression_label.set_text(
-        f"{format_number(left)} {OPERATIONS[operator].symbol}"
+        format_expression(left, operator)
         if isinstance(left, float) and isinstance(operator, str)
         else ""
     )
@@ -131,11 +197,25 @@ def create_app() -> None:
             state["left"] = left
             state["operator"] = operator
             state["display"] = display
+            state["expression"] = ""
+            render()
+
+        def clear_current_entry() -> None:
+            left, operator, display = clear_entry(
+                state["left"] if isinstance(state["left"], float) else None,
+                state["operator"] if isinstance(state["operator"], str) else None,
+            )
+            state["left"] = left
+            state["operator"] = operator
+            state["display"] = display
+            state["expression"] = ""
             render()
 
         def press_digit(digit: str) -> None:
             display = str(state["display"])
             state["display"] = append_digit(display, digit)
+            if not isinstance(state["operator"], str):
+                state["expression"] = ""
             render()
 
         def press_decimal() -> None:
@@ -158,10 +238,11 @@ def create_app() -> None:
             state["left"] = left
             state["operator"] = operator
             state["display"] = display
+            state["expression"] = ""
             render()
 
         def resolve() -> None:
-            left, operator, display = resolve_operation(
+            left, operator, display, expression = resolve_operation_with_expression(
                 state["left"] if isinstance(state["left"], float) else None,
                 state["operator"] if isinstance(state["operator"], str) else None,
                 str(state["display"]),
@@ -169,18 +250,31 @@ def create_app() -> None:
             state["left"] = left
             state["operator"] = operator
             state["display"] = display
+            state["expression"] = expression
+            render()
+
+        def resolve_percentage() -> None:
+            left, operator, display = resolve_percentage_operation(
+                state["left"] if isinstance(state["left"], float) else None,
+                state["operator"] if isinstance(state["operator"], str) else None,
+                str(state["display"]),
+            )
+            state["left"] = left
+            state["operator"] = operator
+            state["display"] = display
+            state["expression"] = ""
             render()
 
         buttons = [
             ("C", clear),
-            ("CE", None),
+            ("CE", clear_current_entry),
             ("±", press_sign_toggle),
-            ("%", None),
-            ("÷", None),
+            ("%", resolve_percentage),
+            (OPERATIONS["divide"].symbol, lambda: choose_operation("divide")),
             ("7", lambda: press_digit("7")),
             ("8", lambda: press_digit("8")),
             ("9", lambda: press_digit("9")),
-            ("x", None),
+            (OPERATIONS["multiply"].symbol, lambda: choose_operation("multiply")),
             (OPERATIONS["subtract"].symbol, lambda: choose_operation("subtract")),
             ("4", lambda: press_digit("4")),
             ("5", lambda: press_digit("5")),
@@ -197,15 +291,23 @@ def create_app() -> None:
         with ui.grid(columns=5).classes("w-full gap-2"):
             for label, handler in buttons:
                 if label.isdigit() or label == ".":
-                    button_class = NUMBER_BUTTON_CLASS
-                elif handler is None:
-                    button_class = INACTIVE_BUTTON_CLASS
-                elif label in {operation.symbol for operation in OPERATIONS.values()} | {"="}:
-                    button_class = OPERATOR_BUTTON_CLASS
+                    button_color = NUMBER_BUTTON_COLOR
+                elif label in {"C", "CE"}:
+                    button_color = CLEAR_BUTTON_COLOR
+                elif label in {operation.symbol for operation in OPERATIONS.values()} | {
+                    "%",
+                    "=",
+                    "±",
+                }:
+                    button_color = OPERATOR_BUTTON_COLOR
                 else:
-                    button_class = ACTION_BUTTON_CLASS
+                    button_color = ACTION_BUTTON_COLOR
 
-                ui.button(label, on_click=handler or (lambda: None)).classes(button_class)
+                button = ui.button(label, on_click=handler, color=button_color).classes(
+                    BUTTON_CLASS
+                )
+                if button_color == ACTION_BUTTON_COLOR:
+                    button.props("text-color=black")
 
 
 if __name__ in {"__main__", "__mp_main__"}:
