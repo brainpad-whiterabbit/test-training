@@ -6,10 +6,19 @@ from training.app import (
     append_decimal,
     append_digit,
     clear_state,
+    render_state,
     resolve_operation,
     select_operation,
     toggle_sign,
 )
+
+
+class FakeLabel:
+    def __init__(self) -> None:
+        self.text = ""
+
+    def set_text(self, text: str) -> None:
+        self.text = text
 
 
 @pytest.mark.parametrize("digit", ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"])
@@ -81,9 +90,30 @@ def test_clear_button_resets_formula_result_and_operation_state() -> None:
 
 def test_button_press_updates_display_within_one_second() -> None:
     """ボタン押下後1秒以内に画面更新されること"""
+    state: dict[str, float | str | None] = {"left": None, "operator": None, "display": "0"}
+    display_label = FakeLabel()
+    expression_label = FakeLabel()
+
     start = perf_counter()
-    display = append_digit("0", "1")
+    state["display"] = append_digit(str(state["display"]), "1")
+    render_state(display_label, expression_label, state)
     elapsed_seconds = perf_counter() - start
 
-    assert display == "1"
+    assert display_label.text == "1"
+    assert elapsed_seconds < 1
+
+
+def test_rapid_button_presses_update_display_without_delay() -> None:
+    """高速連打でも表示遅延しないこと"""
+    state: dict[str, float | str | None] = {"left": None, "operator": None, "display": "0"}
+    display_label = FakeLabel()
+    expression_label = FakeLabel()
+
+    start = perf_counter()
+    for _ in range(100):
+        state["display"] = append_digit(str(state["display"]), "1")
+        render_state(display_label, expression_label, state)
+    elapsed_seconds = perf_counter() - start
+
+    assert display_label.text == "1" * 100
     assert elapsed_seconds < 1

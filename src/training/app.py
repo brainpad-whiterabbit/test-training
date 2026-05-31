@@ -1,4 +1,5 @@
 import os
+from typing import Protocol
 
 from nicegui import ui
 
@@ -10,6 +11,12 @@ NUMBER_BUTTON_CLASS = f"{BUTTON_CLASS} bg-slate-100 text-zinc-950 hover:bg-slate
 ACTION_BUTTON_CLASS = NUMBER_BUTTON_CLASS
 OPERATOR_BUTTON_CLASS = NUMBER_BUTTON_CLASS
 INACTIVE_BUTTON_CLASS = NUMBER_BUTTON_CLASS
+
+type CalculatorState = dict[str, float | str | None]
+
+
+class TextLabel(Protocol):
+    def set_text(self, text: str) -> None: ...
 
 
 def format_number(value: float) -> str:
@@ -73,6 +80,22 @@ def clear_state() -> tuple[None, None, str]:
     return None, None, "0"
 
 
+def render_state(
+    display_label: TextLabel,
+    expression_label: TextLabel,
+    state: CalculatorState,
+) -> None:
+    """Render calculator state to the display labels."""
+    display_label.set_text(str(state["display"]))
+    left = state["left"]
+    operator = state["operator"]
+    expression_label.set_text(
+        f"{format_number(left)} {OPERATIONS[operator].symbol}"
+        if isinstance(left, float) and isinstance(operator, str)
+        else ""
+    )
+
+
 def create_app() -> None:
     ui.page_title("電卓Webアプリ")
 
@@ -83,7 +106,7 @@ def create_app() -> None:
             "shadow-2xl shadow-zinc-200"
         ),
     ):
-        state: dict[str, float | str | None] = {
+        state: CalculatorState = {
             "left": None,
             "operator": None,
             "display": "0",
@@ -100,14 +123,7 @@ def create_app() -> None:
         )
 
         def render() -> None:
-            display_label.set_text(str(state["display"]))
-            left = state["left"]
-            operator = state["operator"]
-            expression_label.set_text(
-                f"{format_number(left)} {OPERATIONS[operator].symbol}"
-                if isinstance(left, float) and isinstance(operator, str)
-                else ""
-            )
+            render_state(display_label, expression_label, state)
 
         def clear() -> None:
             left, operator, display = clear_state()
