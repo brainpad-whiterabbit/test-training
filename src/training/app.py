@@ -55,6 +55,19 @@ def select_operation(
     return float(display), operation_key, "0"
 
 
+def resolve_operation(
+    left: float | None,
+    operator: str | None,
+    display: str,
+) -> tuple[float | None, str | None, str]:
+    """Return calculator state after pressing the equals button."""
+    if left is None or operator is None:
+        return left, operator, display
+
+    result = calculate(left, float(display), operator)
+    return None, None, format_number(result)
+
+
 def create_app() -> None:
     ui.page_title("電卓Webアプリ")
 
@@ -125,15 +138,14 @@ def create_app() -> None:
             render()
 
         def resolve() -> None:
-            left = state["left"]
-            operator = state["operator"]
-            if not isinstance(left, float) or not isinstance(operator, str):
-                return
-
-            right = float(str(state["display"]))
-            state["display"] = format_number(calculate(left, right, operator))
-            state["left"] = None
-            state["operator"] = None
+            left, operator, display = resolve_operation(
+                state["left"] if isinstance(state["left"], float) else None,
+                state["operator"] if isinstance(state["operator"], str) else None,
+                str(state["display"]),
+            )
+            state["left"] = left
+            state["operator"] = operator
+            state["display"] = display
             render()
 
         buttons = [

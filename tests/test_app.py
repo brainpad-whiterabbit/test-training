@@ -1,6 +1,12 @@
 import pytest
 
-from training.app import append_decimal, append_digit, select_operation, toggle_sign
+from training.app import (
+    append_decimal,
+    append_digit,
+    resolve_operation,
+    select_operation,
+    toggle_sign,
+)
 
 
 @pytest.mark.parametrize("digit", ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"])
@@ -50,3 +56,12 @@ def test_consecutive_operation_input_keeps_previous_input() -> None:
 
     assert left == 1.0
     assert operator == "add"
+
+
+def test_equals_button_displays_calculation_result() -> None:
+    """= 押下時に計算結果を表示できること"""
+    left, operator, display = resolve_operation(1.0, "add", "2")
+
+    assert left is None
+    assert operator is None
+    assert display == "3"
