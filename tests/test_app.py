@@ -1,3 +1,5 @@
+from time import perf_counter
+
 import pytest
 
 from training.app import (
@@ -75,3 +77,13 @@ def test_clear_button_resets_formula_result_and_operation_state() -> None:
     assert left is None
     assert operator is None
     assert display == "0"
+
+
+def test_button_press_updates_display_within_one_second() -> None:
+    """ボタン押下後1秒以内に画面更新されること"""
+    start = perf_counter()
+    display = append_digit("0", "1")
+    elapsed_seconds = perf_counter() - start
+
+    assert display == "1"
+    assert elapsed_seconds < 1
