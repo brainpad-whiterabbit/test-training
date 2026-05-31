@@ -32,6 +32,29 @@ def append_decimal(display: str) -> str:
     return f"{display}."
 
 
+def toggle_sign(display: str) -> str:
+    """Return the display after pressing the sign toggle button."""
+    if display == "0":
+        return display
+    if display.startswith("-"):
+        return display[1:]
+
+    return f"-{display}"
+
+
+def select_operation(
+    left: float | None,
+    operator: str | None,
+    display: str,
+    operation_key: str,
+) -> tuple[float | None, str | None, str]:
+    """Return calculator state after pressing an operation button."""
+    if operator is not None and display == "0":
+        return left, operator, display
+
+    return float(display), operation_key, "0"
+
+
 def create_app() -> None:
     ui.page_title("電卓Webアプリ")
 
@@ -84,10 +107,21 @@ def create_app() -> None:
             state["display"] = append_decimal(display)
             render()
 
+        def press_sign_toggle() -> None:
+            display = str(state["display"])
+            state["display"] = toggle_sign(display)
+            render()
+
         def choose_operation(operation_key: str) -> None:
-            state["left"] = float(str(state["display"]))
-            state["operator"] = operation_key
-            state["display"] = "0"
+            left, operator, display = select_operation(
+                state["left"] if isinstance(state["left"], float) else None,
+                state["operator"] if isinstance(state["operator"], str) else None,
+                str(state["display"]),
+                operation_key,
+            )
+            state["left"] = left
+            state["operator"] = operator
+            state["display"] = display
             render()
 
         def resolve() -> None:
@@ -105,7 +139,7 @@ def create_app() -> None:
         buttons = [
             ("C", clear),
             ("CE", None),
-            ("±", None),
+            ("±", press_sign_toggle),
             ("%", None),
             ("÷", None),
             ("7", lambda: press_digit("7")),
