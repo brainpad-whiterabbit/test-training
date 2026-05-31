@@ -108,6 +108,32 @@ def test_equals_button_displays_error_for_division_by_zero() -> None:
     assert display == "Error"
 
 
+def test_clear_button_recovers_from_error() -> None:
+    """Error後にC押下で正常操作へ復帰できること"""
+    left, operator, display = resolve_operation(10.0, "divide", "0")
+    assert display == "Error"
+
+    left, operator, display = clear_state()
+
+    assert left is None
+    assert operator is None
+    assert display == "0"
+    assert append_digit(display, "1") == "1"
+
+
+def test_clear_entry_recovers_from_error() -> None:
+    """Error後にCE押下で正常操作へ復帰できること"""
+    left, operator, display = resolve_operation(10.0, "divide", "0")
+    assert display == "Error"
+
+    left, operator, display = clear_entry(left, operator)
+
+    assert left is None
+    assert operator is None
+    assert display == "0"
+    assert append_digit(display, "1") == "1"
+
+
 def test_equals_button_displays_overflow_for_out_of_range_result() -> None:
     """計算結果が表示桁数を超えた場合にOverflowを表示できること"""
     left, operator, display = resolve_operation(999999.0, "add", "1")
