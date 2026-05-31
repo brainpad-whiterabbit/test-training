@@ -25,6 +25,7 @@
       "indent": 4
     }
   },
+  "explorer.excludeGitIgnore": true,
   "files.exclude": {
     "**/.mypy_cache": true,
     "**/.pytest_cache": true,
