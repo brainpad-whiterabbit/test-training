@@ -74,7 +74,7 @@ def select_operation(
 ) -> tuple[float | None, str | None, str]:
     """演算子ボタン押下後の電卓状態を返す。"""
     if operator is not None and display == "0":
-        return left, operator, display
+        return left, operation_key, display
 
     return float(display), operation_key, "0"
 
