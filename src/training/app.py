@@ -24,6 +24,14 @@ def append_digit(display: str, digit: str) -> str:
     return f"{display}{digit}"
 
 
+def append_decimal(display: str) -> str:
+    """Return the display after pressing the decimal point button."""
+    if "." in display:
+        return display
+
+    return f"{display}."
+
+
 def create_app() -> None:
     ui.page_title("電卓Webアプリ")
 
@@ -71,10 +79,9 @@ def create_app() -> None:
             state["display"] = append_digit(display, digit)
             render()
 
-        def append_decimal() -> None:
+        def press_decimal() -> None:
             display = str(state["display"])
-            if "." not in display:
-                state["display"] = f"{display}."
+            state["display"] = append_decimal(display)
             render()
 
         def choose_operation(operation_key: str) -> None:
@@ -109,7 +116,7 @@ def create_app() -> None:
             ("4", lambda: press_digit("4")),
             ("5", lambda: press_digit("5")),
             ("6", lambda: press_digit("6")),
-            (".", append_decimal),
+            (".", press_decimal),
             (OPERATIONS["add"].symbol, lambda: choose_operation("add")),
             ("1", lambda: press_digit("1")),
             ("2", lambda: press_digit("2")),
