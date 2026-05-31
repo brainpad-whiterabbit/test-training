@@ -49,6 +49,34 @@ def test_decimal_button_from_initial_zero_can_create_decimal_value() -> None:
     assert append_digit(append_decimal("0"), "5") == "0.5"
 
 
+@pytest.mark.parametrize(
+    ("display", "digit", "expected"),
+    [
+        ("99999", "9", "999999"),
+        ("999999", "9", "999999"),
+        ("-99999", "9", "-999999"),
+        ("-999999", "9", "-999999"),
+        ("1.999", "9", "1.9999"),
+        ("1.9999", "9", "1.9999"),
+        ("123456", "7", "123456"),
+        ("0.1234", "5", "0.1234"),
+    ],
+    ids=[
+        "integer-part-allows-six-digits",
+        "integer-part-rejects-seventh-digit",
+        "negative-integer-part-allows-six-digits",
+        "negative-integer-part-rejects-seventh-digit",
+        "fractional-part-allows-four-digits",
+        "fractional-part-rejects-fifth-digit",
+        "keeps-display-when-integer-limit-exceeded",
+        "keeps-display-when-fractional-limit-exceeded",
+    ],
+)
+def test_display_digit_limit_cases(display: str, digit: str, expected: str) -> None:
+    """表示桁数制限に従って入力値を更新できること"""
+    assert append_digit(display, digit) == expected
+
+
 def test_sign_toggle_converts_positive_number_to_negative_number() -> None:
     """± 押下時に負数へ変換できること"""
     assert toggle_sign("5") == "-5"
@@ -188,7 +216,7 @@ def test_rapid_button_presses_update_display_without_delay() -> None:
         render_state(display_label, expression_label, state)
     elapsed_seconds = perf_counter() - start
 
-    assert display_label.text == "1" * 100
+    assert display_label.text == "111111"
     assert elapsed_seconds < 1
 
 

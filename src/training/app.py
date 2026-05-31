@@ -6,6 +6,8 @@ from nicegui import ui
 from training.calculator import OPERATIONS, CalculationOverflowError, DivisionByZeroError, calculate
 
 DEFAULT_OPERATION_KEY = "add"
+MAX_INTEGER_DIGITS = 6
+MAX_FRACTIONAL_DIGITS = 4
 BUTTON_CLASS = "h-14 w-full rounded-md text-xl font-semibold"
 NUMBER_BUTTON_CLASS = f"{BUTTON_CLASS} bg-slate-100 text-zinc-950 hover:bg-slate-200"
 ACTION_BUTTON_CLASS = NUMBER_BUTTON_CLASS
@@ -28,7 +30,14 @@ def append_digit(display: str, digit: str) -> str:
     if display == "0":
         return digit
 
-    return f"{display}{digit}"
+    next_display = f"{display}{digit}"
+    integer_part, _, fractional_part = next_display.lstrip("-").partition(".")
+    if len(integer_part) > MAX_INTEGER_DIGITS:
+        return display
+    if len(fractional_part) > MAX_FRACTIONAL_DIGITS:
+        return display
+
+    return next_display
 
 
 def append_decimal(display: str) -> str:
