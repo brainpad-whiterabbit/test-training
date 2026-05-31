@@ -2,7 +2,7 @@ import os
 
 from nicegui import ui
 
-from training.calculator import OPERATIONS, calculate
+from training.calculator import OPERATIONS, append_digit, calculate
 
 DEFAULT_OPERATION_KEY = "add"
 BUTTON_CLASS = "h-14 w-full rounded-md text-xl font-semibold"
@@ -58,9 +58,9 @@ def create_app() -> None:
             state["display"] = "0"
             render()
 
-        def append_digit(digit: str) -> None:
+        def press_digit(digit: str) -> None:
             display = str(state["display"])
-            state["display"] = digit if display == "0" else f"{display}{digit}"
+            state["display"] = append_digit(display, digit)
             render()
 
         def append_decimal() -> None:
@@ -93,20 +93,20 @@ def create_app() -> None:
             ("±", None),
             ("%", None),
             ("÷", None),
-            ("7", lambda: append_digit("7")),
-            ("8", lambda: append_digit("8")),
-            ("9", lambda: append_digit("9")),
+            ("7", lambda: press_digit("7")),
+            ("8", lambda: press_digit("8")),
+            ("9", lambda: press_digit("9")),
             ("x", None),
             (OPERATIONS["subtract"].symbol, lambda: choose_operation("subtract")),
-            ("4", lambda: append_digit("4")),
-            ("5", lambda: append_digit("5")),
-            ("6", lambda: append_digit("6")),
+            ("4", lambda: press_digit("4")),
+            ("5", lambda: press_digit("5")),
+            ("6", lambda: press_digit("6")),
             (".", append_decimal),
             (OPERATIONS["add"].symbol, lambda: choose_operation("add")),
-            ("1", lambda: append_digit("1")),
-            ("2", lambda: append_digit("2")),
-            ("3", lambda: append_digit("3")),
-            ("0", lambda: append_digit("0")),
+            ("1", lambda: press_digit("1")),
+            ("2", lambda: press_digit("2")),
+            ("3", lambda: press_digit("3")),
+            ("0", lambda: press_digit("0")),
             ("=", resolve),
         ]
 

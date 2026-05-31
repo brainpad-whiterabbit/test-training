@@ -26,6 +26,14 @@ def subtract(left: float, right: float) -> float:
     return left - right
 
 
+def append_digit(display: str, digit: str) -> str:
+    """Return the display after pressing a digit button."""
+    if display == "0":
+        return digit
+
+    return f"{display}{digit}"
+
+
 OPERATIONS: dict[str, Operation] = {
     "add": Operation(key="add", label="足し算", symbol="+", calculate=add),
     "subtract": Operation(key="subtract", label="引き算", symbol="-", calculate=subtract),

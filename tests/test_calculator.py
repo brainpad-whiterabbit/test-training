@@ -1,6 +1,11 @@
 import pytest
 
-from training import OPERATIONS, UnsupportedOperationError, add, calculate, subtract
+from training import OPERATIONS, UnsupportedOperationError, add, append_digit, calculate, subtract
+
+
+@pytest.mark.parametrize("digit", ["1", "2", "3", "4", "5", "6", "7", "8", "9"])
+def test_tv_001_number_button_displays_digit_from_initial_zero(digit: str) -> None:
+    assert append_digit("0", digit) == digit
 
 
 def test_add_returns_sum() -> None:
