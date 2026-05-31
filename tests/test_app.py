@@ -99,6 +99,15 @@ def test_equals_button_can_resolve_division() -> None:
     assert display == "5"
 
 
+def test_equals_button_displays_error_for_division_by_zero() -> None:
+    """0除算時にErrorを表示できること"""
+    left, operator, display = resolve_operation(10.0, "divide", "0")
+
+    assert left is None
+    assert operator is None
+    assert display == "Error"
+
+
 def test_clear_button_resets_formula_result_and_operation_state() -> None:
     """C 押下時に入力中の計算式、計算結果、演算状態を初期化できること"""
     left, operator, display = clear_state()

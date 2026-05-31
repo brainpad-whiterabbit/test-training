@@ -3,7 +3,7 @@ from typing import Protocol
 
 from nicegui import ui
 
-from training.calculator import OPERATIONS, CalculationResult, calculate
+from training.calculator import OPERATIONS, DivisionByZeroError, calculate
 
 DEFAULT_OPERATION_KEY = "add"
 BUTTON_CLASS = "h-14 w-full rounded-md text-xl font-semibold"
@@ -19,10 +19,7 @@ class TextLabel(Protocol):
     def set_text(self, text: str) -> object: ...
 
 
-def format_number(value: CalculationResult) -> str:
-    if isinstance(value, str):
-        return value
-
+def format_number(value: float) -> str:
     return f"{value:g}"
 
 
@@ -74,7 +71,11 @@ def resolve_operation(
     if left is None or operator is None:
         return left, operator, display
 
-    result = calculate(left, float(display), operator)
+    try:
+        result = calculate(left, float(display), operator)
+    except DivisionByZeroError:
+        return None, None, "Error"
+
     return None, None, format_number(result)
 
 

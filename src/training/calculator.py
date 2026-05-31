@@ -1,13 +1,16 @@
 from collections.abc import Callable
 from dataclasses import dataclass
 
-type CalculationResult = float | str
-type BinaryOperation = Callable[[float, float], CalculationResult]
+type BinaryOperation = Callable[[float, float], float]
 DECIMAL_PLACES = 4
 
 
 class UnsupportedOperationError(ValueError):
     """指定された電卓の演算が登録されていない場合に送出される例外。"""
+
+
+class DivisionByZeroError(ZeroDivisionError):
+    """0除算が発生した場合に送出される例外。"""
 
 
 @dataclass(frozen=True)
@@ -33,10 +36,10 @@ def multiply(left: float, right: float) -> float:
     return left * right
 
 
-def divide(left: float, right: float) -> CalculationResult:
+def divide(left: float, right: float) -> float:
     """2つの数値の商を返す。"""
     if right == 0:
-        return "Error"
+        raise DivisionByZeroError("Cannot divide by zero")
 
     return left / right
 
@@ -54,13 +57,9 @@ OPERATIONS: dict[str, Operation] = {
 }
 
 
-def calculate(left: float, right: float, operation_key: str = "add") -> CalculationResult:
+def calculate(left: float, right: float, operation_key: str = "add") -> float:
     operation = OPERATIONS.get(operation_key)
     if operation is None:
         raise UnsupportedOperationError(f"Unsupported operation: {operation_key}")
 
-    result = operation.calculate(left, right)
-    if isinstance(result, str):
-        return result
-
-    return normalize_result(result)
+    return normalize_result(operation.calculate(left, right))

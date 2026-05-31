@@ -1,6 +1,6 @@
 import pytest
 
-from training.calculator import calculate
+from training.calculator import DivisionByZeroError, calculate
 
 
 @pytest.mark.parametrize(
@@ -118,28 +118,6 @@ def test_division_cases(left: float, right: float, expected: float) -> None:
 
 
 @pytest.mark.parametrize(
-    ("left", "right", "expected"),
-    [
-        (10, 0, "Error"),
-        (-10, 0, "Error"),
-        (0, 0, "Error"),
-        (999999, 0, "Error"),
-        (-999999, 0, "Error"),
-    ],
-    ids=[
-        "positive-divided-by-zero",
-        "negative-divided-by-zero",
-        "zero-divided-by-zero",
-        "maximum-divided-by-zero",
-        "minimum-divided-by-zero",
-    ],
-)
-def test_division_by_zero_cases(left: float, right: float, expected: str) -> None:
-    """0除算時にErrorを返すこと"""
-    assert calculate(left, right, "divide") == expected
-
-
-@pytest.mark.parametrize(
     ("left", "right", "operation_key", "expected"),
     [
         (1.5, 2.5, "add", 4.0),
@@ -176,3 +154,26 @@ def test_decimal_cases(
 ) -> None:
     """小数を含む代表的な入力値の組み合わせを計算できること"""
     assert calculate(left, right, operation_key) == expected
+
+
+@pytest.mark.parametrize(
+    ("left", "right"),
+    [
+        (10, 0),
+        (-10, 0),
+        (0, 0),
+        (999999, 0),
+        (-999999, 0),
+    ],
+    ids=[
+        "positive-divided-by-zero",
+        "negative-divided-by-zero",
+        "zero-divided-by-zero",
+        "maximum-divided-by-zero",
+        "minimum-divided-by-zero",
+    ],
+)
+def test_division_by_zero_cases(left: float, right: float) -> None:
+    """0除算時に例外を送出すること"""
+    with pytest.raises(DivisionByZeroError):
+        calculate(left, right, "divide")
