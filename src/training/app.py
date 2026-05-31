@@ -9,10 +9,10 @@ DEFAULT_OPERATION_KEY = "add"
 MAX_INTEGER_DIGITS = 6
 MAX_FRACTIONAL_DIGITS = 4
 BUTTON_CLASS = "h-14 w-full rounded-md text-xl font-semibold"
-NUMBER_BUTTON_CLASS = f"{BUTTON_CLASS} bg-slate-100 text-zinc-950 hover:bg-slate-200"
-ACTION_BUTTON_CLASS = NUMBER_BUTTON_CLASS
-OPERATOR_BUTTON_CLASS = NUMBER_BUTTON_CLASS
-INACTIVE_BUTTON_CLASS = NUMBER_BUTTON_CLASS
+NUMBER_BUTTON_COLOR = "blue"
+ACTION_BUTTON_COLOR = "grey-4"
+CLEAR_BUTTON_COLOR = "red"
+OPERATOR_BUTTON_COLOR = "orange"
 
 type CalculatorState = dict[str, float | str | None]
 
@@ -257,15 +257,23 @@ def create_app() -> None:
         with ui.grid(columns=5).classes("w-full gap-2"):
             for label, handler in buttons:
                 if label.isdigit() or label == ".":
-                    button_class = NUMBER_BUTTON_CLASS
-                elif handler is None:
-                    button_class = INACTIVE_BUTTON_CLASS
-                elif label in {operation.symbol for operation in OPERATIONS.values()} | {"="}:
-                    button_class = OPERATOR_BUTTON_CLASS
+                    button_color = NUMBER_BUTTON_COLOR
+                elif label in {"C", "CE"}:
+                    button_color = CLEAR_BUTTON_COLOR
+                elif label in {operation.symbol for operation in OPERATIONS.values()} | {
+                    "%",
+                    "=",
+                    "±",
+                }:
+                    button_color = OPERATOR_BUTTON_COLOR
                 else:
-                    button_class = ACTION_BUTTON_CLASS
+                    button_color = ACTION_BUTTON_COLOR
 
-                ui.button(label, on_click=handler or (lambda: None)).classes(button_class)
+                button = ui.button(label, on_click=handler, color=button_color).classes(
+                    BUTTON_CLASS
+                )
+                if button_color == ACTION_BUTTON_COLOR:
+                    button.props("text-color=black")
 
 
 if __name__ in {"__main__", "__mp_main__"}:
