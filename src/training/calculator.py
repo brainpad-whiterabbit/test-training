@@ -26,9 +26,21 @@ def subtract(left: float, right: float) -> float:
     return left - right
 
 
+def multiply(left: float, right: float) -> float:
+    """Return the product of two numbers."""
+    return left * right
+
+
+def divide(left: float, right: float) -> float:
+    """Return the quotient of two numbers."""
+    return left / right
+
+
 OPERATIONS: dict[str, Operation] = {
     "add": Operation(key="add", label="足し算", symbol="+", calculate=add),
     "subtract": Operation(key="subtract", label="引き算", symbol="-", calculate=subtract),
+    "multiply": Operation(key="multiply", label="掛け算", symbol="x", calculate=multiply),
+    "divide": Operation(key="divide", label="割り算", symbol="÷", calculate=divide),
 }
 
 

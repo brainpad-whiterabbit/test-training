@@ -57,3 +57,61 @@ def test_addition_cases(left: float, right: float, expected: float) -> None:
 def test_subtraction_cases(left: float, right: float, expected: float) -> None:
     """減算の代表的な入力値の組み合わせを計算できること"""
     assert calculate(left, right, "subtract") == expected
+
+
+@pytest.mark.parametrize(
+    ("left", "right", "expected"),
+    [
+        (-2, -5, 10),
+        (-2, 5, -10),
+        (2, -5, -10),
+        (5, 5, 25),
+        (0, 5, 0),
+        (999999, 1, 999999),
+        (-999999, 1, -999999),
+    ],
+    ids=[
+        "negative-times-negative",
+        "negative-times-positive",
+        "positive-times-negative",
+        "positive-times-positive",
+        "includes-zero",
+        "includes-maximum",
+        "includes-minimum",
+    ],
+)
+def test_multiplication_cases(left: float, right: float, expected: float) -> None:
+    """乗算の代表的な入力値の組み合わせを計算できること"""
+    assert calculate(left, right, "multiply") == expected
+
+
+@pytest.mark.parametrize(
+    ("left", "right", "expected"),
+    [
+        (-10, -2, 5),
+        (-10, 2, -5),
+        (10, -2, -5),
+        (10, 2, 5),
+        (0, 10, 0),
+        (999999, 9, 111111),
+        (-999999, 9, -111111),
+        (999999, 999999, 1),
+        (-999999, -999999, 1),
+        (999999, -999999, -1),
+    ],
+    ids=[
+        "negative-divided-by-negative",
+        "negative-divided-by-positive",
+        "positive-divided-by-negative",
+        "positive-divided-by-positive",
+        "zero-divided-by-positive",
+        "includes-maximum",
+        "includes-minimum",
+        "maximum-divided-by-maximum",
+        "minimum-divided-by-minimum",
+        "maximum-divided-by-minimum",
+    ],
+)
+def test_division_cases(left: float, right: float, expected: float) -> None:
+    """除算の代表的な入力値の組み合わせを計算できること"""
+    assert calculate(left, right, "divide") == expected
