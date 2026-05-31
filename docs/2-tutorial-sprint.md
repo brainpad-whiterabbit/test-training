@@ -185,7 +185,7 @@ git checkout -b ensyu/2026/taro.yamada
         - 電卓の演算ロジックを実装している箇所
         - 減算のロジックの実装が必要
 
-2. テスト実装
+1. テスト実装
     - `tests/test_app.py`
         - 電卓アプリのUIのテストコードを実装している箇所
         - 減算のUIの挙動に対するテスト実装が必要
@@ -193,14 +193,21 @@ git checkout -b ensyu/2026/taro.yamada
         - 電卓の演算ロジックのテストコードを実装している箇所
         - 減算のロジックに対するテスト実装が必要
 
-3. 静的解析
-    - コードの品質を保つため、静的解析用のスクリプトを実行してエラーや警告が出ないか確認してください。
+1. テスト実行
+   全てのテストが通ることを確認してください。
+
+    ```bash
+    PYTHONPATH=src uv run pytest
+    ```
+
+1. 静的解析
+    - 静的解析用のスクリプトを実行してエラーや警告が出ないか確認してください。
 
     ```bash
     ./scripts/check.sh
     ```
 
-4. 変更をコミット
+1. 変更をコミット
 
     ```bash title="コミット例"
     git add src/training/app.py src/training/calculator.py
@@ -208,7 +215,7 @@ git checkout -b ensyu/2026/taro.yamada
 
     ```
 
-5. 変更をプッシュ
+1. 変更をプッシュ
 
     ```bash
     git push origin <your-branch-name>
