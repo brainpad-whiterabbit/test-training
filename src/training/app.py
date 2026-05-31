@@ -90,6 +90,22 @@ def resolve_operation(
     return None, None, format_number(result)
 
 
+def resolve_percentage_operation(
+    left: float | None,
+    operator: str | None,
+    display: str,
+) -> tuple[float | None, str | None, str]:
+    """パーセントボタン押下後の電卓状態を返す。"""
+    if left is None or operator is None:
+        return clear_state()
+
+    display_value = float(display)
+    percentage_value = (
+        left * display_value / 100 if operator in {"add", "subtract"} else display_value / 100
+    )
+    return resolve_operation(left, operator, format_number(percentage_value))
+
+
 def clear_state() -> tuple[None, None, str]:
     """クリアボタン押下後の電卓状態を返す。"""
     return None, None, "0"
@@ -204,11 +220,22 @@ def create_app() -> None:
             state["display"] = display
             render()
 
+        def resolve_percentage() -> None:
+            left, operator, display = resolve_percentage_operation(
+                state["left"] if isinstance(state["left"], float) else None,
+                state["operator"] if isinstance(state["operator"], str) else None,
+                str(state["display"]),
+            )
+            state["left"] = left
+            state["operator"] = operator
+            state["display"] = display
+            render()
+
         buttons = [
             ("C", clear),
             ("CE", clear_current_entry),
             ("±", press_sign_toggle),
-            ("%", None),
+            ("%", resolve_percentage),
             (OPERATIONS["divide"].symbol, lambda: choose_operation("divide")),
             ("7", lambda: press_digit("7")),
             ("8", lambda: press_digit("8")),
