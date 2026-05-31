@@ -10,6 +10,7 @@ from training.app import (
     initial_state,
     render_state,
     resolve_operation,
+    resolve_operation_with_expression,
     resolve_percentage_operation,
     select_operation,
     toggle_sign,
@@ -86,6 +87,36 @@ def test_sign_toggle_converts_positive_number_to_negative_number() -> None:
 def test_sign_toggle_converts_negative_number_to_positive_number() -> None:
     """± 再押下時に正数へ戻せること"""
     assert toggle_sign("-5") == "5"
+
+
+def test_expression_display_shows_left_input_and_operator_during_second_input() -> None:
+    """入力2の状態で入力1と演算子を式表示欄に表示できること"""
+    state: dict[str, float | str | None] = {"left": 12.0, "operator": "add", "display": "3"}
+    display_label = FakeLabel()
+    expression_label = FakeLabel()
+
+    render_state(display_label, expression_label, state)
+
+    assert display_label.text == "3"
+    assert expression_label.text == "12 +"
+
+
+def test_expression_display_shows_full_expression_after_successful_calculation() -> None:
+    """計算成功後に入力1と演算子と入力2を式表示欄に表示できること"""
+    left, operator, display, expression = resolve_operation_with_expression(12.0, "add", "3")
+    state: dict[str, float | str | None] = {
+        "left": left,
+        "operator": operator,
+        "display": display,
+        "expression": expression,
+    }
+    display_label = FakeLabel()
+    expression_label = FakeLabel()
+
+    render_state(display_label, expression_label, state)
+
+    assert display_label.text == "15"
+    assert expression_label.text == "12 + 3"
 
 
 def test_consecutive_operation_input_is_ignored() -> None:

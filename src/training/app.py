@@ -25,6 +25,14 @@ def format_number(value: float) -> str:
     return f"{value:g}"
 
 
+def format_expression(left: float, operator: str, right: str | None = None) -> str:
+    expression = f"{format_number(left)} {OPERATIONS[operator].symbol}"
+    if right is None:
+        return expression
+
+    return f"{expression} {right}"
+
+
 def append_digit(display: str, digit: str) -> str:
     """数字ボタン押下後の表示値を返す。"""
     if display == "0":
@@ -77,17 +85,31 @@ def resolve_operation(
     display: str,
 ) -> tuple[float | None, str | None, str]:
     """イコールボタン押下後の電卓状態を返す。"""
+    next_left, next_operator, next_display, _expression = resolve_operation_with_expression(
+        left,
+        operator,
+        display,
+    )
+    return next_left, next_operator, next_display
+
+
+def resolve_operation_with_expression(
+    left: float | None,
+    operator: str | None,
+    display: str,
+) -> tuple[float | None, str | None, str, str]:
+    """イコールボタン押下後の電卓状態と式表示値を返す。"""
     if left is None or operator is None:
-        return left, operator, display
+        return left, operator, display, ""
 
     try:
         result = calculate(left, float(display), operator)
     except DivisionByZeroError:
-        return None, None, "Error"
+        return None, None, "Error", ""
     except CalculationOverflowError:
-        return None, None, "Overflow"
+        return None, None, "Overflow", ""
 
-    return None, None, format_number(result)
+    return None, None, format_number(result), format_expression(left, operator, display)
 
 
 def resolve_percentage_operation(
@@ -131,10 +153,15 @@ def render_state(
 ) -> None:
     """電卓状態を表示ラベルに反映する。"""
     display_label.set_text(str(state["display"]))
+    expression = state.get("expression")
+    if isinstance(expression, str) and expression:
+        expression_label.set_text(expression)
+        return
+
     left = state["left"]
     operator = state["operator"]
     expression_label.set_text(
-        f"{format_number(left)} {OPERATIONS[operator].symbol}"
+        format_expression(left, operator)
         if isinstance(left, float) and isinstance(operator, str)
         else ""
     )
@@ -170,6 +197,7 @@ def create_app() -> None:
             state["left"] = left
             state["operator"] = operator
             state["display"] = display
+            state["expression"] = ""
             render()
 
         def clear_current_entry() -> None:
@@ -180,11 +208,14 @@ def create_app() -> None:
             state["left"] = left
             state["operator"] = operator
             state["display"] = display
+            state["expression"] = ""
             render()
 
         def press_digit(digit: str) -> None:
             display = str(state["display"])
             state["display"] = append_digit(display, digit)
+            if not isinstance(state["operator"], str):
+                state["expression"] = ""
             render()
 
         def press_decimal() -> None:
@@ -207,10 +238,11 @@ def create_app() -> None:
             state["left"] = left
             state["operator"] = operator
             state["display"] = display
+            state["expression"] = ""
             render()
 
         def resolve() -> None:
-            left, operator, display = resolve_operation(
+            left, operator, display, expression = resolve_operation_with_expression(
                 state["left"] if isinstance(state["left"], float) else None,
                 state["operator"] if isinstance(state["operator"], str) else None,
                 str(state["display"]),
@@ -218,6 +250,7 @@ def create_app() -> None:
             state["left"] = left
             state["operator"] = operator
             state["display"] = display
+            state["expression"] = expression
             render()
 
         def resolve_percentage() -> None:
@@ -229,6 +262,7 @@ def create_app() -> None:
             state["left"] = left
             state["operator"] = operator
             state["display"] = display
+            state["expression"] = ""
             render()
 
         buttons = [
