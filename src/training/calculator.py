@@ -2,6 +2,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 
 type BinaryOperation = Callable[[float, float], float]
+DECIMAL_PLACES = 4
 
 
 class UnsupportedOperationError(ValueError):
@@ -36,6 +37,11 @@ def divide(left: float, right: float) -> float:
     return left / right
 
 
+def normalize_result(value: float) -> float:
+    """計算結果を表示可能な小数桁数に丸めて返す。"""
+    return round(value, DECIMAL_PLACES)
+
+
 OPERATIONS: dict[str, Operation] = {
     "add": Operation(key="add", label="足し算", symbol="+", calculate=add),
     "subtract": Operation(key="subtract", label="引き算", symbol="-", calculate=subtract),
@@ -49,4 +55,4 @@ def calculate(left: float, right: float, operation_key: str = "add") -> float:
     if operation is None:
         raise UnsupportedOperationError(f"Unsupported operation: {operation_key}")
 
-    return operation.calculate(left, right)
+    return normalize_result(operation.calculate(left, right))
