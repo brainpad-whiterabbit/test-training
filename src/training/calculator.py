@@ -5,7 +5,7 @@ type BinaryOperation = Callable[[float, float], float]
 
 
 class UnsupportedOperationError(ValueError):
-    """Raised when a requested calculator operation is not registered."""
+    """指定された電卓の演算が登録されていない場合に送出される例外。"""
 
 
 @dataclass(frozen=True)
@@ -17,22 +17,22 @@ class Operation:
 
 
 def add(left: float, right: float) -> float:
-    """Return the sum of two numbers."""
+    """2つの数値の和を返す。"""
     return left + right
 
 
 def subtract(left: float, right: float) -> float:
-    """Return the difference between two numbers."""
+    """2つの数値の差を返す。"""
     return left - right
 
 
 def multiply(left: float, right: float) -> float:
-    """Return the product of two numbers."""
+    """2つの数値の積を返す。"""
     return left * right
 
 
 def divide(left: float, right: float) -> float:
-    """Return the quotient of two numbers."""
+    """2つの数値の商を返す。"""
     return left / right
 
 

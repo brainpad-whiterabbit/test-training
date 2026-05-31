@@ -24,7 +24,7 @@ def format_number(value: float) -> str:
 
 
 def append_digit(display: str, digit: str) -> str:
-    """Return the display after pressing a digit button."""
+    """数字ボタン押下後の表示値を返す。"""
     if display == "0":
         return digit
 
@@ -32,7 +32,7 @@ def append_digit(display: str, digit: str) -> str:
 
 
 def append_decimal(display: str) -> str:
-    """Return the display after pressing the decimal point button."""
+    """小数点ボタン押下後の表示値を返す。"""
     if "." in display:
         return display
 
@@ -40,7 +40,7 @@ def append_decimal(display: str) -> str:
 
 
 def toggle_sign(display: str) -> str:
-    """Return the display after pressing the sign toggle button."""
+    """符号反転ボタン押下後の表示値を返す。"""
     if display == "0":
         return display
     if display.startswith("-"):
@@ -55,7 +55,7 @@ def select_operation(
     display: str,
     operation_key: str,
 ) -> tuple[float | None, str | None, str]:
-    """Return calculator state after pressing an operation button."""
+    """演算子ボタン押下後の電卓状態を返す。"""
     if operator is not None and display == "0":
         return left, operator, display
 
@@ -67,7 +67,7 @@ def resolve_operation(
     operator: str | None,
     display: str,
 ) -> tuple[float | None, str | None, str]:
-    """Return calculator state after pressing the equals button."""
+    """イコールボタン押下後の電卓状態を返す。"""
     if left is None or operator is None:
         return left, operator, display
 
@@ -76,12 +76,12 @@ def resolve_operation(
 
 
 def clear_state() -> tuple[None, None, str]:
-    """Return calculator state after pressing the clear button."""
+    """クリアボタン押下後の電卓状態を返す。"""
     return None, None, "0"
 
 
 def initial_state() -> CalculatorState:
-    """Return calculator state for a newly loaded page."""
+    """ページ読み込み直後の電卓状態を返す。"""
     return {"left": None, "operator": None, "display": "0"}
 
 
@@ -90,7 +90,7 @@ def render_state(
     expression_label: TextLabel,
     state: CalculatorState,
 ) -> None:
-    """Render calculator state to the display labels."""
+    """電卓状態を表示ラベルに反映する。"""
     display_label.set_text(str(state["display"]))
     left = state["left"]
     operator = state["operator"]
