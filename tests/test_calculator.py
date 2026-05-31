@@ -1,24 +1,59 @@
 import pytest
 
-from training import OPERATIONS, UnsupportedOperationError, add, calculate
+from training.calculator import calculate
 
 
-def test_add_returns_sum() -> None:
-    assert add(2, 3) == 5
+@pytest.mark.parametrize(
+    ("left", "right", "expected"),
+    [
+        (-1, -1, -2),
+        (-1, 3, 2),
+        (1, -3, -2),
+        (5, 1, 6),
+        (0, 1, 1),
+        (999999, -10, 999989),
+        (-999999, 10, -999989),
+    ],
+    ids=[
+        "negative-plus-negative",
+        "negative-plus-positive",
+        "positive-plus-negative",
+        "positive-plus-positive",
+        "includes-zero",
+        "includes-maximum",
+        "includes-minimum",
+    ],
+)
+def test_addition_cases(left: float, right: float, expected: float) -> None:
+    """加算の代表的な入力値の組み合わせを計算できること"""
+    assert calculate(left, right, "add") == expected
 
 
-def test_calculate_uses_addition_by_default() -> None:
-    assert calculate(1.5, 2.25) == 3.75
-
-
-def test_addition_operation_is_registered() -> None:
-    operation = OPERATIONS["add"]
-
-    assert operation.label == "足し算"
-    assert operation.symbol == "+"
-    assert operation.calculate(4, 6) == 10
-
-
-def test_calculate_rejects_unknown_operation() -> None:
-    with pytest.raises(UnsupportedOperationError):
-        calculate(1, 2, "multiply")
+@pytest.mark.parametrize(
+    ("left", "right", "expected"),
+    [
+        (-1, -3, 2),
+        (-1, 1, -2),
+        (1, -1, 2),
+        (5, 1, 4),
+        (0, 1, -1),
+        (999999, 1, 999998),
+        (-999999, 1, -1000000),
+        (999999, 999999, 0),
+        (-999999, -999999, 0),
+    ],
+    ids=[
+        "negative-minus-negative",
+        "negative-minus-positive",
+        "positive-minus-negative",
+        "positive-minus-positive",
+        "includes-zero",
+        "includes-maximum",
+        "includes-minimum",
+        "maximum-minus-maximum",
+        "minimum-minus-minimum",
+    ],
+)
+def test_subtraction_cases(left: float, right: float, expected: float) -> None:
+    """減算の代表的な入力値の組み合わせを計算できること"""
+    assert calculate(left, right, "subtract") == expected

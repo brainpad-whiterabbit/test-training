@@ -1,4 +1,5 @@
 import os
+from typing import Protocol
 
 from nicegui import ui
 
@@ -11,9 +12,93 @@ ACTION_BUTTON_CLASS = NUMBER_BUTTON_CLASS
 OPERATOR_BUTTON_CLASS = NUMBER_BUTTON_CLASS
 INACTIVE_BUTTON_CLASS = NUMBER_BUTTON_CLASS
 
+type CalculatorState = dict[str, float | str | None]
+
+
+class TextLabel(Protocol):
+    def set_text(self, text: str) -> object: ...
+
 
 def format_number(value: float) -> str:
     return f"{value:g}"
+
+
+def append_digit(display: str, digit: str) -> str:
+    """Return the display after pressing a digit button."""
+    if display == "0":
+        return digit
+
+    return f"{display}{digit}"
+
+
+def append_decimal(display: str) -> str:
+    """Return the display after pressing the decimal point button."""
+    if "." in display:
+        return display
+
+    return f"{display}."
+
+
+def toggle_sign(display: str) -> str:
+    """Return the display after pressing the sign toggle button."""
+    if display == "0":
+        return display
+    if display.startswith("-"):
+        return display[1:]
+
+    return f"-{display}"
+
+
+def select_operation(
+    left: float | None,
+    operator: str | None,
+    display: str,
+    operation_key: str,
+) -> tuple[float | None, str | None, str]:
+    """Return calculator state after pressing an operation button."""
+    if operator is not None and display == "0":
+        return left, operator, display
+
+    return float(display), operation_key, "0"
+
+
+def resolve_operation(
+    left: float | None,
+    operator: str | None,
+    display: str,
+) -> tuple[float | None, str | None, str]:
+    """Return calculator state after pressing the equals button."""
+    if left is None or operator is None:
+        return left, operator, display
+
+    result = calculate(left, float(display), operator)
+    return None, None, format_number(result)
+
+
+def clear_state() -> tuple[None, None, str]:
+    """Return calculator state after pressing the clear button."""
+    return None, None, "0"
+
+
+def initial_state() -> CalculatorState:
+    """Return calculator state for a newly loaded page."""
+    return {"left": None, "operator": None, "display": "0"}
+
+
+def render_state(
+    display_label: TextLabel,
+    expression_label: TextLabel,
+    state: CalculatorState,
+) -> None:
+    """Render calculator state to the display labels."""
+    display_label.set_text(str(state["display"]))
+    left = state["left"]
+    operator = state["operator"]
+    expression_label.set_text(
+        f"{format_number(left)} {OPERATIONS[operator].symbol}"
+        if isinstance(left, float) and isinstance(operator, str)
+        else ""
+    )
 
 
 def create_app() -> None:
@@ -26,12 +111,7 @@ def create_app() -> None:
             "shadow-2xl shadow-zinc-200"
         ),
     ):
-        operation = OPERATIONS[DEFAULT_OPERATION_KEY]
-        state: dict[str, float | str | None] = {
-            "left": None,
-            "operator": None,
-            "display": "0",
-        }
+        state = initial_state()
 
         with ui.row().classes("w-full items-center justify-between"):
             ui.label("電卓Webアプリ").classes("text-sm font-semibold text-zinc-500")
@@ -44,76 +124,74 @@ def create_app() -> None:
         )
 
         def render() -> None:
-            display_label.set_text(str(state["display"]))
-            left = state["left"]
-            operator = state["operator"]
-            expression_label.set_text(
-                f"{format_number(left)} {operation.symbol}"
-                if isinstance(left, float) and operator
-                else ""
-            )
+            render_state(display_label, expression_label, state)
 
         def clear() -> None:
-            state["left"] = None
-            state["operator"] = None
-            state["display"] = "0"
+            left, operator, display = clear_state()
+            state["left"] = left
+            state["operator"] = operator
+            state["display"] = display
             render()
 
-        def append_digit(digit: str) -> None:
+        def press_digit(digit: str) -> None:
             display = str(state["display"])
-            state["display"] = digit if display == "0" else f"{display}{digit}"
+            state["display"] = append_digit(display, digit)
             render()
 
-        def append_decimal() -> None:
+        def press_decimal() -> None:
             display = str(state["display"])
-            if "." not in display:
-                state["display"] = f"{display}."
+            state["display"] = append_decimal(display)
             render()
 
-        def choose_operation() -> None:
-            state["left"] = float(str(state["display"]))
-            state["operator"] = DEFAULT_OPERATION_KEY
-            state["display"] = "0"
+        def press_sign_toggle() -> None:
+            display = str(state["display"])
+            state["display"] = toggle_sign(display)
+            render()
+
+        def choose_operation(operation_key: str) -> None:
+            left, operator, display = select_operation(
+                state["left"] if isinstance(state["left"], float) else None,
+                state["operator"] if isinstance(state["operator"], str) else None,
+                str(state["display"]),
+                operation_key,
+            )
+            state["left"] = left
+            state["operator"] = operator
+            state["display"] = display
             render()
 
         def resolve() -> None:
-            left = state["left"]
-            operator = state["operator"]
-            if not isinstance(left, float) or not isinstance(operator, str):
-                return
-
-            right = float(str(state["display"]))
-            state["display"] = format_number(calculate(left, right, operator))
-            state["left"] = None
-            state["operator"] = None
+            left, operator, display = resolve_operation(
+                state["left"] if isinstance(state["left"], float) else None,
+                state["operator"] if isinstance(state["operator"], str) else None,
+                str(state["display"]),
+            )
+            state["left"] = left
+            state["operator"] = operator
+            state["display"] = display
             render()
 
         buttons = [
-            ("MC", None),
-            ("MR", None),
-            ("M-", None),
-            ("M+", None),
-            ("AC", None),
-            ("CE", None),
             ("C", clear),
-            ("±", None),
+            ("CE", None),
+            ("±", press_sign_toggle),
             ("%", None),
             ("÷", None),
-            ("7", lambda: append_digit("7")),
-            ("8", lambda: append_digit("8")),
-            ("9", lambda: append_digit("9")),
+            ("7", lambda: press_digit("7")),
+            ("8", lambda: press_digit("8")),
+            ("9", lambda: press_digit("9")),
             ("x", None),
-            ("-", None),
-            ("4", lambda: append_digit("4")),
-            ("5", lambda: append_digit("5")),
-            ("6", lambda: append_digit("6")),
-            (operation.symbol, choose_operation),
+            (OPERATIONS["subtract"].symbol, lambda: choose_operation("subtract")),
+            ("4", lambda: press_digit("4")),
+            ("5", lambda: press_digit("5")),
+            ("6", lambda: press_digit("6")),
+            (".", press_decimal),
+            (OPERATIONS["add"].symbol, lambda: choose_operation("add")),
+            ("1", lambda: press_digit("1")),
+            ("2", lambda: press_digit("2")),
+            ("3", lambda: press_digit("3")),
+            ("0", lambda: press_digit("0")),
             ("=", resolve),
-            ("1", lambda: append_digit("1")),
-            ("2", lambda: append_digit("2")),
-            ("3", lambda: append_digit("3")),
-            ("0", lambda: append_digit("0")),
-            (".", append_decimal),
         ]
 
         with ui.grid(columns=5).classes("w-full gap-2"):
@@ -122,7 +200,7 @@ def create_app() -> None:
                     button_class = NUMBER_BUTTON_CLASS
                 elif handler is None:
                     button_class = INACTIVE_BUTTON_CLASS
-                elif label in {operation.symbol, "="}:
+                elif label in {operation.symbol for operation in OPERATIONS.values()} | {"="}:
                     button_class = OPERATOR_BUTTON_CLASS
                 else:
                     button_class = ACTION_BUTTON_CLASS
@@ -130,8 +208,6 @@ def create_app() -> None:
                 ui.button(label, on_click=handler or (lambda: None)).classes(button_class)
 
 
-create_app()
-
-
 if __name__ in {"__main__", "__mp_main__"}:
+    create_app()
     ui.run(title="電卓Webアプリ", reload=False, port=int(os.environ.get("PORT", "8080")))

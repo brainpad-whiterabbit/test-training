@@ -7,6 +7,8 @@ extra_css = ["stylesheets/extra.css"]
 extra_javascript = [
   "https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js",
   "javascripts/tablesort.js",
+  "https://unpkg.com/mermaid@10.9.3/dist/mermaid.min.js",
+  "javascripts/mermaid.js",
 ]
 
 [project.theme]
@@ -40,9 +42,20 @@ toggle.icon = "lucide/moon"
 toggle.name = "ライトモードに切り替え"
 
 [project.markdown_extensions.admonition]
+[project.markdown_extensions.pymdownx.details]
 [project.markdown_extensions.tables]
 [project.markdown_extensions.pymdownx.tabbed]
 alternate_style = true
 
 [project.markdown_extensions.pymdownx.superfences]
+custom_fences = [
+  { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" }
+]
 [project.markdown_extensions.pymdownx.tilde]
+
+[project.markdown_extensions.toc]
+permalink = true
+
+[project.markdown_extensions.toc.slugify]
+object = "pymdownx.slugs.slugify"
+kwds = { case = "lower" }

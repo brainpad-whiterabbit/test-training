@@ -21,8 +21,14 @@ def add(left: float, right: float) -> float:
     return left + right
 
 
+def subtract(left: float, right: float) -> float:
+    """Return the difference between two numbers."""
+    return left - right
+
+
 OPERATIONS: dict[str, Operation] = {
     "add": Operation(key="add", label="足し算", symbol="+", calculate=add),
+    "subtract": Operation(key="subtract", label="引き算", symbol="-", calculate=subtract),
 }
 
 
