@@ -3,6 +3,7 @@ import pytest
 from training.app import (
     append_decimal,
     append_digit,
+    clear_state,
     resolve_operation,
     select_operation,
     toggle_sign,
@@ -65,3 +66,12 @@ def test_equals_button_displays_calculation_result() -> None:
     assert left is None
     assert operator is None
     assert display == "3"
+
+
+def test_clear_button_resets_formula_result_and_operation_state() -> None:
+    """C 押下時に入力中の計算式、計算結果、演算状態を初期化できること"""
+    left, operator, display = clear_state()
+
+    assert left is None
+    assert operator is None
+    assert display == "0"

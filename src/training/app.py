@@ -68,6 +68,11 @@ def resolve_operation(
     return None, None, format_number(result)
 
 
+def clear_state() -> tuple[None, None, str]:
+    """Return calculator state after pressing the clear button."""
+    return None, None, "0"
+
+
 def create_app() -> None:
     ui.page_title("電卓Webアプリ")
 
@@ -105,9 +110,10 @@ def create_app() -> None:
             )
 
         def clear() -> None:
-            state["left"] = None
-            state["operator"] = None
-            state["display"] = "0"
+            left, operator, display = clear_state()
+            state["left"] = left
+            state["operator"] = operator
+            state["display"] = display
             render()
 
         def press_digit(digit: str) -> None:
