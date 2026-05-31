@@ -205,10 +205,16 @@ def test_overflow_cases(left: float, right: float, operation_key: str) -> None:
 @pytest.mark.parametrize(
     ("left", "right", "operation_key", "expected"),
     [
+        (999998, 1, "add", 999999),
+        (-999998, 1, "subtract", -999999),
+        (1.234, 0.0005, "add", 1.2345),
         (1, 3, "divide", 0.3333),
         (999999.9999, 0.9999, "subtract", 999999),
     ],
     ids=[
+        "maximum-result-within-display-range",
+        "minimum-result-within-display-range",
+        "displays-four-decimal-places",
         "rounds-fractional-part-to-four-decimal-places",
         "rounded-result-within-maximum",
     ],
