@@ -1,7 +1,8 @@
 from collections.abc import Callable
 from dataclasses import dataclass
 
-type BinaryOperation = Callable[[float, float], float]
+type CalculationResult = float | str
+type BinaryOperation = Callable[[float, float], CalculationResult]
 DECIMAL_PLACES = 4
 
 
@@ -32,8 +33,11 @@ def multiply(left: float, right: float) -> float:
     return left * right
 
 
-def divide(left: float, right: float) -> float:
+def divide(left: float, right: float) -> CalculationResult:
     """2つの数値の商を返す。"""
+    if right == 0:
+        return "Error"
+
     return left / right
 
 
@@ -50,9 +54,13 @@ OPERATIONS: dict[str, Operation] = {
 }
 
 
-def calculate(left: float, right: float, operation_key: str = "add") -> float:
+def calculate(left: float, right: float, operation_key: str = "add") -> CalculationResult:
     operation = OPERATIONS.get(operation_key)
     if operation is None:
         raise UnsupportedOperationError(f"Unsupported operation: {operation_key}")
 
-    return normalize_result(operation.calculate(left, right))
+    result = operation.calculate(left, right)
+    if isinstance(result, str):
+        return result
+
+    return normalize_result(result)

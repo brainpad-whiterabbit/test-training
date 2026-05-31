@@ -3,7 +3,7 @@ from typing import Protocol
 
 from nicegui import ui
 
-from training.calculator import OPERATIONS, calculate
+from training.calculator import OPERATIONS, CalculationResult, calculate
 
 DEFAULT_OPERATION_KEY = "add"
 BUTTON_CLASS = "h-14 w-full rounded-md text-xl font-semibold"
@@ -19,7 +19,10 @@ class TextLabel(Protocol):
     def set_text(self, text: str) -> object: ...
 
 
-def format_number(value: float) -> str:
+def format_number(value: CalculationResult) -> str:
+    if isinstance(value, str):
+        return value
+
     return f"{value:g}"
 
 
@@ -80,6 +83,14 @@ def clear_state() -> tuple[None, None, str]:
     return None, None, "0"
 
 
+def clear_entry(
+    left: float | None,
+    operator: str | None,
+) -> tuple[float | None, str | None, str]:
+    """入力クリアボタン押下後の電卓状態を返す。"""
+    return left, operator, "0"
+
+
 def initial_state() -> CalculatorState:
     """ページ読み込み直後の電卓状態を返す。"""
     return {"left": None, "operator": None, "display": "0"}
@@ -133,6 +144,16 @@ def create_app() -> None:
             state["display"] = display
             render()
 
+        def clear_current_entry() -> None:
+            left, operator, display = clear_entry(
+                state["left"] if isinstance(state["left"], float) else None,
+                state["operator"] if isinstance(state["operator"], str) else None,
+            )
+            state["left"] = left
+            state["operator"] = operator
+            state["display"] = display
+            render()
+
         def press_digit(digit: str) -> None:
             display = str(state["display"])
             state["display"] = append_digit(display, digit)
@@ -173,14 +194,14 @@ def create_app() -> None:
 
         buttons = [
             ("C", clear),
-            ("CE", None),
+            ("CE", clear_current_entry),
             ("±", press_sign_toggle),
             ("%", None),
-            ("÷", None),
+            (OPERATIONS["divide"].symbol, lambda: choose_operation("divide")),
             ("7", lambda: press_digit("7")),
             ("8", lambda: press_digit("8")),
             ("9", lambda: press_digit("9")),
-            ("x", None),
+            (OPERATIONS["multiply"].symbol, lambda: choose_operation("multiply")),
             (OPERATIONS["subtract"].symbol, lambda: choose_operation("subtract")),
             ("4", lambda: press_digit("4")),
             ("5", lambda: press_digit("5")),
