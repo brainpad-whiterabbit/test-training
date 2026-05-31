@@ -1,6 +1,13 @@
 import pytest
 
-from training import OPERATIONS, UnsupportedOperationError, add, append_digit, calculate, subtract
+from training.calculator import (
+    OPERATIONS,
+    UnsupportedOperationError,
+    add,
+    append_digit,
+    calculate,
+    subtract,
+)
 
 
 @pytest.mark.parametrize("digit", ["1", "2", "3", "4", "5", "6", "7", "8", "9"])
