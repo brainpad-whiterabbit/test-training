@@ -2,7 +2,7 @@ import os
 
 from nicegui import ui
 
-from training.calculator import OPERATIONS, append_digit, calculate
+from training.calculator import OPERATIONS, calculate
 
 DEFAULT_OPERATION_KEY = "add"
 BUTTON_CLASS = "h-14 w-full rounded-md text-xl font-semibold"
@@ -14,6 +14,14 @@ INACTIVE_BUTTON_CLASS = NUMBER_BUTTON_CLASS
 
 def format_number(value: float) -> str:
     return f"{value:g}"
+
+
+def append_digit(display: str, digit: str) -> str:
+    """Return the display after pressing a digit button."""
+    if display == "0":
+        return digit
+
+    return f"{display}{digit}"
 
 
 def create_app() -> None:
@@ -124,8 +132,6 @@ def create_app() -> None:
                 ui.button(label, on_click=handler or (lambda: None)).classes(button_class)
 
 
-create_app()
-
-
 if __name__ in {"__main__", "__mp_main__"}:
+    create_app()
     ui.run(title="電卓Webアプリ", reload=False, port=int(os.environ.get("PORT", "8080")))
