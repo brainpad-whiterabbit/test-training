@@ -3,7 +3,7 @@ from typing import Protocol
 
 from nicegui import ui
 
-from training.calculator import OPERATIONS, DivisionByZeroError, calculate
+from training.calculator import OPERATIONS, CalculationOverflowError, DivisionByZeroError, calculate
 
 DEFAULT_OPERATION_KEY = "add"
 BUTTON_CLASS = "h-14 w-full rounded-md text-xl font-semibold"
@@ -75,6 +75,8 @@ def resolve_operation(
         result = calculate(left, float(display), operator)
     except DivisionByZeroError:
         return None, None, "Error"
+    except CalculationOverflowError:
+        return None, None, "Overflow"
 
     return None, None, format_number(result)
 

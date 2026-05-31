@@ -1,6 +1,6 @@
 import pytest
 
-from training.calculator import DivisionByZeroError, calculate
+from training.calculator import CalculationOverflowError, DivisionByZeroError, calculate
 
 
 @pytest.mark.parametrize(
@@ -38,7 +38,7 @@ def test_addition_cases(left: float, right: float, expected: float) -> None:
         (5, 1, 4),
         (0, 1, -1),
         (999999, 1, 999998),
-        (-999999, 1, -1000000),
+        (-999999, 0, -999999),
         (999999, 999999, 0),
         (-999999, -999999, 0),
     ],
@@ -177,3 +177,47 @@ def test_division_by_zero_cases(left: float, right: float) -> None:
     """0除算時に例外を送出すること"""
     with pytest.raises(DivisionByZeroError):
         calculate(left, right, "divide")
+
+
+@pytest.mark.parametrize(
+    ("left", "right", "operation_key"),
+    [
+        (999999, 1, "add"),
+        (-999999, 1, "subtract"),
+        (999999, 999999, "multiply"),
+        (-999999, -999999, "multiply"),
+        (999999, -999999, "multiply"),
+    ],
+    ids=[
+        "addition-exceeds-maximum",
+        "subtraction-exceeds-minimum",
+        "positive-multiplication-exceeds-maximum",
+        "negative-multiplication-exceeds-maximum",
+        "mixed-sign-multiplication-exceeds-minimum",
+    ],
+)
+def test_overflow_cases(left: float, right: float, operation_key: str) -> None:
+    """計算結果が表示桁数を超える場合に例外を送出すること"""
+    with pytest.raises(CalculationOverflowError):
+        calculate(left, right, operation_key)
+
+
+@pytest.mark.parametrize(
+    ("left", "right", "operation_key", "expected"),
+    [
+        (1, 3, "divide", 0.3333),
+        (999999.9999, 0.9999, "subtract", 999999),
+    ],
+    ids=[
+        "rounds-fractional-part-to-four-decimal-places",
+        "rounded-result-within-maximum",
+    ],
+)
+def test_result_digit_limit_cases(
+    left: float,
+    right: float,
+    operation_key: str,
+    expected: float,
+) -> None:
+    """表示桁数内の計算結果を丸めて返すこと"""
+    assert calculate(left, right, operation_key) == expected

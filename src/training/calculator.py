@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 type BinaryOperation = Callable[[float, float], float]
 DECIMAL_PLACES = 4
+MAX_DISPLAY_VALUE = 999999.9999
 
 
 class UnsupportedOperationError(ValueError):
@@ -11,6 +12,10 @@ class UnsupportedOperationError(ValueError):
 
 class DivisionByZeroError(ZeroDivisionError):
     """0除算が発生した場合に送出される例外。"""
+
+
+class CalculationOverflowError(OverflowError):
+    """計算結果が表示可能な範囲を超えた場合に送出される例外。"""
 
 
 @dataclass(frozen=True)
@@ -46,7 +51,11 @@ def divide(left: float, right: float) -> float:
 
 def normalize_result(value: float) -> float:
     """計算結果を表示可能な小数桁数に丸めて返す。"""
-    return round(value, DECIMAL_PLACES)
+    result = round(value, DECIMAL_PLACES)
+    if abs(result) > MAX_DISPLAY_VALUE:
+        raise CalculationOverflowError("Calculation result is out of display range")
+
+    return result
 
 
 OPERATIONS: dict[str, Operation] = {

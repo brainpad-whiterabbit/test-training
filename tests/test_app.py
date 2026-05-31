@@ -108,6 +108,15 @@ def test_equals_button_displays_error_for_division_by_zero() -> None:
     assert display == "Error"
 
 
+def test_equals_button_displays_overflow_for_out_of_range_result() -> None:
+    """計算結果が表示桁数を超えた場合にOverflowを表示できること"""
+    left, operator, display = resolve_operation(999999.0, "add", "1")
+
+    assert left is None
+    assert operator is None
+    assert display == "Overflow"
+
+
 def test_clear_button_resets_formula_result_and_operation_state() -> None:
     """C 押下時に入力中の計算式、計算結果、演算状態を初期化できること"""
     left, operator, display = clear_state()
