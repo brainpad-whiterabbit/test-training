@@ -16,7 +16,7 @@ type CalculatorState = dict[str, float | str | None]
 
 
 class TextLabel(Protocol):
-    def set_text(self, text: str) -> None: ...
+    def set_text(self, text: str) -> object: ...
 
 
 def format_number(value: float) -> str:
