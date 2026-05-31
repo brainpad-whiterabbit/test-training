@@ -6,6 +6,7 @@ from training.app import (
     append_decimal,
     append_digit,
     clear_state,
+    initial_state,
     render_state,
     resolve_operation,
     select_operation,
@@ -117,3 +118,22 @@ def test_rapid_button_presses_update_display_without_delay() -> None:
 
     assert display_label.text == "1" * 100
     assert elapsed_seconds < 1
+
+
+def test_reload_starts_from_initial_state() -> None:
+    """ページ再読み込み後に初期状態で開始できること"""
+    assert initial_state() == {"left": None, "operator": None, "display": "0"}
+
+
+def test_reload_does_not_keep_previous_operation_state() -> None:
+    """リロード時に演算状態を保持しないこと"""
+    previous_state = initial_state()
+    previous_state["left"] = 1.0
+    previous_state["operator"] = "add"
+    previous_state["display"] = "2"
+
+    reloaded_state = initial_state()
+
+    assert reloaded_state["left"] is None
+    assert reloaded_state["operator"] is None
+    assert reloaded_state["display"] == "0"

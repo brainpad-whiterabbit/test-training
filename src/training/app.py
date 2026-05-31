@@ -80,6 +80,11 @@ def clear_state() -> tuple[None, None, str]:
     return None, None, "0"
 
 
+def initial_state() -> CalculatorState:
+    """Return calculator state for a newly loaded page."""
+    return {"left": None, "operator": None, "display": "0"}
+
+
 def render_state(
     display_label: TextLabel,
     expression_label: TextLabel,
@@ -106,11 +111,7 @@ def create_app() -> None:
             "shadow-2xl shadow-zinc-200"
         ),
     ):
-        state: CalculatorState = {
-            "left": None,
-            "operator": None,
-            "display": "0",
-        }
+        state = initial_state()
 
         with ui.row().classes("w-full items-center justify-between"):
             ui.label("電卓Webアプリ").classes("text-sm font-semibold text-zinc-500")
