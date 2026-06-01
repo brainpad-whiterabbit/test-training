@@ -120,20 +120,20 @@ def test_expression_display_shows_full_expression_after_successful_calculation()
 
 def test_consecutive_operation_input_overwrites_previous_operator() -> None:
     """演算子連続入力時に後続入力で演算子を上書きできること"""
-    assert select_operation(1.0, "add", "0", "subtract") == (1.0, "subtract", "0")
+    assert select_operation(1.0, "previous", "0", "add") == (1.0, "add", "0")
 
 
 def test_consecutive_operation_input_keeps_left_input_and_display() -> None:
     """演算子連続入力時も入力1と表示値を保持できること"""
-    left, operator, _display = select_operation(1.0, "add", "0", "subtract")
+    left, operator, _display = select_operation(1.0, "previous", "0", "add")
 
     assert left == 1.0
-    assert operator == "subtract"
+    assert operator == "add"
 
 
 def test_expression_display_reflects_overwritten_operator() -> None:
     """演算子連続入力後の式表示欄に上書き後の演算子を表示できること"""
-    left, operator, display = select_operation(1.0, "add", "0", "subtract")
+    left, operator, display = select_operation(1.0, "previous", "0", "add")
     state: dict[str, float | str | None] = {"left": left, "operator": operator, "display": display}
     display_label = FakeLabel()
     expression_label = FakeLabel()
@@ -141,7 +141,7 @@ def test_expression_display_reflects_overwritten_operator() -> None:
     render_state(display_label, expression_label, state)
 
     assert display_label.text == "0"
-    assert expression_label.text == "1 -"
+    assert expression_label.text == "1 +"
 
 
 def test_equals_button_displays_calculation_result() -> None:

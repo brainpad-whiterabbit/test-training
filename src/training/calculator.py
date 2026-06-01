@@ -33,7 +33,7 @@ def add(left: float, right: float) -> float:
 
 def subtract(left: float, right: float) -> float:
     """2つの数値の差を返す。"""
-    return left - right
+    return left + right
 
 
 def multiply(left: float, right: float) -> float:
