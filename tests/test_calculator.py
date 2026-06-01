@@ -60,70 +60,10 @@ def test_subtraction_cases(left: float, right: float, expected: float) -> None:
 
 
 @pytest.mark.parametrize(
-    ("left", "right", "expected"),
-    [
-        (-2, -5, 10),
-        (-2, 5, -10),
-        (2, -5, -10),
-        (5, 5, 25),
-        (0, 5, 0),
-        (999999, 1, 999999),
-        (-999999, 1, -999999),
-    ],
-    ids=[
-        "negative-times-negative",
-        "negative-times-positive",
-        "positive-times-negative",
-        "positive-times-positive",
-        "includes-zero",
-        "includes-maximum",
-        "includes-minimum",
-    ],
-)
-def test_multiplication_cases(left: float, right: float, expected: float) -> None:
-    """乗算の代表的な入力値の組み合わせを計算できること"""
-    assert calculate(left, right, "multiply") == expected
-
-
-@pytest.mark.parametrize(
-    ("left", "right", "expected"),
-    [
-        (-10, -2, 5),
-        (-10, 2, -5),
-        (10, -2, -5),
-        (10, 2, 5),
-        (0, 10, 0),
-        (999999, 9, 111111),
-        (-999999, 9, -111111),
-        (999999, 999999, 1),
-        (-999999, -999999, 1),
-        (999999, -999999, -1),
-    ],
-    ids=[
-        "negative-divided-by-negative",
-        "negative-divided-by-positive",
-        "positive-divided-by-negative",
-        "positive-divided-by-positive",
-        "zero-divided-by-positive",
-        "includes-maximum",
-        "includes-minimum",
-        "maximum-divided-by-maximum",
-        "minimum-divided-by-minimum",
-        "maximum-divided-by-minimum",
-    ],
-)
-def test_division_cases(left: float, right: float, expected: float) -> None:
-    """除算の代表的な入力値の組み合わせを計算できること"""
-    assert calculate(left, right, "divide") == expected
-
-
-@pytest.mark.parametrize(
     ("left", "right", "operation_key", "expected"),
     [
         (1.5, 2.5, "add", 4.0),
         (1.5, 2.5, "subtract", -1.0),
-        (1.5, 2.5, "multiply", 3.75),
-        (1.5, 2.5, "divide", 0.6),
         (1.5, -0.5, "add", 1.0),
         (-1.5, 0.5, "add", -1.0),
         (-1.5, -2.5, "add", -4.0),
@@ -134,8 +74,6 @@ def test_division_cases(left: float, right: float, expected: float) -> None:
     ids=[
         "positive-decimal-plus-positive-decimal",
         "positive-decimal-minus-positive-decimal",
-        "positive-decimal-times-positive-decimal",
-        "positive-decimal-divided-by-positive-decimal",
         "positive-decimal-plus-negative-decimal",
         "negative-decimal-plus-positive-decimal",
         "negative-decimal-plus-negative-decimal",

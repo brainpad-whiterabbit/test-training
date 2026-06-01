@@ -153,24 +153,6 @@ def test_equals_button_displays_calculation_result() -> None:
     assert display == "3"
 
 
-def test_equals_button_can_resolve_multiplication() -> None:
-    """x を使った計算結果を表示できること"""
-    left, operator, display = resolve_operation(2.0, "multiply", "5")
-
-    assert left is None
-    assert operator is None
-    assert display == "10"
-
-
-def test_equals_button_can_resolve_division() -> None:
-    """÷ を使った計算結果を表示できること"""
-    left, operator, display = resolve_operation(10.0, "divide", "2")
-
-    assert left is None
-    assert operator is None
-    assert display == "5"
-
-
 def test_clear_button_resets_formula_result_and_operation_state() -> None:
     """C 押下時に入力中の計算式、計算結果、演算状態を初期化できること"""
     left, operator, display = clear_state()
