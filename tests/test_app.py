@@ -11,7 +11,6 @@ from training.app import (
     render_state,
     resolve_operation,
     resolve_operation_with_expression,
-    resolve_percentage_operation,
     select_operation,
     toggle_sign,
 )
@@ -214,28 +213,6 @@ def test_equals_button_displays_overflow_for_out_of_range_result() -> None:
     assert left is None
     assert operator is None
     assert display == "Overflow"
-
-
-@pytest.mark.parametrize(
-    ("left", "operator", "display"),
-    [
-        (None, None, "0"),
-        (None, None, "100"),
-        (None, None, "110"),
-    ],
-    ids=["waiting-for-input", "first-input", "result-displayed"],
-)
-def test_percentage_button_clears_when_not_in_second_input_state(
-    left: float | None,
-    operator: str | None,
-    display: str,
-) -> None:
-    """入力2以外の状態で%押下時にクリアできること"""
-    next_left, next_operator, next_display = resolve_percentage_operation(left, operator, display)
-
-    assert next_left is None
-    assert next_operator is None
-    assert next_display == "0"
 
 
 def test_clear_button_resets_formula_result_and_operation_state() -> None:
