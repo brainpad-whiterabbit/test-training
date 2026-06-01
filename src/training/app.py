@@ -11,8 +11,8 @@ MAX_FRACTIONAL_DIGITS = 4
 BUTTON_CLASS = "h-14 w-full rounded-md text-xl font-semibold"
 NUMBER_BUTTON_COLOR = "blue"
 ACTION_BUTTON_COLOR = "grey-4"
-CLEAR_BUTTON_COLOR = "red"
-OPERATOR_BUTTON_COLOR = "orange"
+CLEAR_BUTTON_COLOR = "blue"
+OPERATOR_BUTTON_COLOR = "blue"
 
 type CalculatorState = dict[str, float | str | None]
 
@@ -105,9 +105,9 @@ def resolve_operation_with_expression(
     try:
         result = calculate(left, float(display), operator)
     except DivisionByZeroError:
-        return None, None, "Error", ""
+        return None, None, "DivisionByZeroError", ""
     except CalculationOverflowError:
-        return None, None, "Overflow", ""
+        return None, None, "CalculationOverflowError", ""
 
     return None, None, format_number(result), format_expression(left, operator, display)
 
@@ -118,14 +118,7 @@ def resolve_percentage_operation(
     display: str,
 ) -> tuple[float | None, str | None, str]:
     """パーセントボタン押下後の電卓状態を返す。"""
-    if left is None or operator is None:
-        return clear_state()
-
-    display_value = float(display)
-    percentage_value = (
-        left * display_value / 100 if operator in {"add", "subtract"} else display_value / 100
-    )
-    return resolve_operation(left, operator, format_number(percentage_value))
+    return clear_state()
 
 
 def clear_state() -> tuple[None, None, str]:

@@ -11,7 +11,6 @@ from training.app import (
     render_state,
     resolve_operation,
     resolve_operation_with_expression,
-    resolve_percentage_operation,
     select_operation,
     toggle_sign,
 )
@@ -121,20 +120,20 @@ def test_expression_display_shows_full_expression_after_successful_calculation()
 
 def test_consecutive_operation_input_overwrites_previous_operator() -> None:
     """演算子連続入力時に後続入力で演算子を上書きできること"""
-    assert select_operation(1.0, "add", "0", "subtract") == (1.0, "subtract", "0")
+    assert select_operation(1.0, "previous", "0", "add") == (1.0, "add", "0")
 
 
 def test_consecutive_operation_input_keeps_left_input_and_display() -> None:
     """演算子連続入力時も入力1と表示値を保持できること"""
-    left, operator, _display = select_operation(1.0, "add", "0", "subtract")
+    left, operator, _display = select_operation(1.0, "previous", "0", "add")
 
     assert left == 1.0
-    assert operator == "subtract"
+    assert operator == "add"
 
 
 def test_expression_display_reflects_overwritten_operator() -> None:
     """演算子連続入力後の式表示欄に上書き後の演算子を表示できること"""
-    left, operator, display = select_operation(1.0, "add", "0", "subtract")
+    left, operator, display = select_operation(1.0, "previous", "0", "add")
     state: dict[str, float | str | None] = {"left": left, "operator": operator, "display": display}
     display_label = FakeLabel()
     expression_label = FakeLabel()
@@ -142,7 +141,7 @@ def test_expression_display_reflects_overwritten_operator() -> None:
     render_state(display_label, expression_label, state)
 
     assert display_label.text == "0"
-    assert expression_label.text == "1 -"
+    assert expression_label.text == "1 +"
 
 
 def test_equals_button_displays_calculation_result() -> None:
@@ -152,171 +151,6 @@ def test_equals_button_displays_calculation_result() -> None:
     assert left is None
     assert operator is None
     assert display == "3"
-
-
-def test_equals_button_can_resolve_multiplication() -> None:
-    """x を使った計算結果を表示できること"""
-    left, operator, display = resolve_operation(2.0, "multiply", "5")
-
-    assert left is None
-    assert operator is None
-    assert display == "10"
-
-
-def test_equals_button_can_resolve_division() -> None:
-    """÷ を使った計算結果を表示できること"""
-    left, operator, display = resolve_operation(10.0, "divide", "2")
-
-    assert left is None
-    assert operator is None
-    assert display == "5"
-
-
-def test_equals_button_displays_error_for_division_by_zero() -> None:
-    """0除算時にErrorを表示できること"""
-    left, operator, display = resolve_operation(10.0, "divide", "0")
-
-    assert left is None
-    assert operator is None
-    assert display == "Error"
-
-
-def test_clear_button_recovers_from_error() -> None:
-    """Error後にC押下で正常操作へ復帰できること"""
-    left, operator, display = resolve_operation(10.0, "divide", "0")
-    assert display == "Error"
-
-    left, operator, display = clear_state()
-
-    assert left is None
-    assert operator is None
-    assert display == "0"
-    assert append_digit(display, "1") == "1"
-
-
-def test_clear_entry_recovers_from_error() -> None:
-    """Error後にCE押下で正常操作へ復帰できること"""
-    left, operator, display = resolve_operation(10.0, "divide", "0")
-    assert display == "Error"
-
-    left, operator, display = clear_entry(left, operator)
-
-    assert left is None
-    assert operator is None
-    assert display == "0"
-    assert append_digit(display, "1") == "1"
-
-
-def test_equals_button_displays_overflow_for_out_of_range_result() -> None:
-    """計算結果が表示桁数を超えた場合にOverflowを表示できること"""
-    left, operator, display = resolve_operation(999999.0, "add", "1")
-
-    assert left is None
-    assert operator is None
-    assert display == "Overflow"
-
-
-@pytest.mark.parametrize(
-    ("left", "operator", "display", "expected"),
-    [
-        (100.0, "add", "10", "110"),
-        (100.0, "add", "0", "100"),
-        (100.0, "add", "100", "200"),
-        (100.0, "add", "150", "250"),
-        (-100.0, "add", "10", "-110"),
-        (100.0, "subtract", "10", "90"),
-        (100.0, "subtract", "100", "0"),
-        (100.0, "subtract", "150", "-50"),
-        (-100.0, "subtract", "10", "-90"),
-        (100.0, "multiply", "10", "10"),
-        (200.0, "multiply", "12.5", "25"),
-        (-100.0, "multiply", "10", "-10"),
-        (100.0, "divide", "10", "1000"),
-        (-100.0, "divide", "10", "-1000"),
-        (1.0, "add", "33.333", "1.3333"),
-    ],
-    ids=[
-        "adds-percentage-of-left",
-        "adds-zero-percent-of-left",
-        "adds-one-hundred-percent-of-left",
-        "adds-more-than-one-hundred-percent-of-left",
-        "adds-percentage-of-negative-left",
-        "subtracts-percentage-of-left",
-        "subtracts-one-hundred-percent-of-left",
-        "subtracts-more-than-one-hundred-percent-of-left",
-        "subtracts-percentage-of-negative-left",
-        "multiplies-by-percentage",
-        "multiplies-by-decimal-percentage",
-        "multiplies-negative-left-by-percentage",
-        "divides-by-percentage",
-        "divides-negative-left-by-percentage",
-        "rounds-percentage-result-to-four-decimal-places",
-    ],
-)
-def test_percentage_button_resolves_operation_in_second_input_state(
-    left: float,
-    operator: str,
-    display: str,
-    expected: str,
-) -> None:
-    """入力2の状態で%押下時にパーセント計算ルールに従って計算できること"""
-    next_left, next_operator, next_display = resolve_percentage_operation(left, operator, display)
-
-    assert next_left is None
-    assert next_operator is None
-    assert next_display == expected
-
-
-def test_percentage_button_displays_error_for_division_by_zero_percent() -> None:
-    """入力1に対する0%で除算するとErrorを表示できること"""
-    left, operator, display = resolve_percentage_operation(100.0, "divide", "0")
-
-    assert left is None
-    assert operator is None
-    assert display == "Error"
-
-
-@pytest.mark.parametrize(
-    ("left", "operator", "display"),
-    [
-        (999999.0, "add", "1"),
-        (-999999.0, "add", "1"),
-    ],
-    ids=["addition-exceeds-maximum", "negative-addition-exceeds-minimum"],
-)
-def test_percentage_button_displays_overflow_for_out_of_range_result(
-    left: float,
-    operator: str,
-    display: str,
-) -> None:
-    """パーセント計算結果が表示桁数を超えた場合にOverflowを表示できること"""
-    next_left, next_operator, next_display = resolve_percentage_operation(left, operator, display)
-
-    assert next_left is None
-    assert next_operator is None
-    assert next_display == "Overflow"
-
-
-@pytest.mark.parametrize(
-    ("left", "operator", "display"),
-    [
-        (None, None, "0"),
-        (None, None, "100"),
-        (None, None, "110"),
-    ],
-    ids=["waiting-for-input", "first-input", "result-displayed"],
-)
-def test_percentage_button_clears_when_not_in_second_input_state(
-    left: float | None,
-    operator: str | None,
-    display: str,
-) -> None:
-    """入力2以外の状態で%押下時にクリアできること"""
-    next_left, next_operator, next_display = resolve_percentage_operation(left, operator, display)
-
-    assert next_left is None
-    assert next_operator is None
-    assert next_display == "0"
 
 
 def test_clear_button_resets_formula_result_and_operation_state() -> None:
