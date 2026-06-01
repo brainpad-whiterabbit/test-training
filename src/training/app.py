@@ -11,8 +11,8 @@ MAX_FRACTIONAL_DIGITS = 4
 BUTTON_CLASS = "h-14 w-full rounded-md text-xl font-semibold"
 NUMBER_BUTTON_COLOR = "blue"
 ACTION_BUTTON_COLOR = "grey-4"
-CLEAR_BUTTON_COLOR = "red"
-OPERATOR_BUTTON_COLOR = "orange"
+CLEAR_BUTTON_COLOR = "blue"
+OPERATOR_BUTTON_COLOR = "blue"
 
 type CalculatorState = dict[str, float | str | None]
 
