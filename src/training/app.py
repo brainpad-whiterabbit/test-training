@@ -121,10 +121,7 @@ def resolve_percentage_operation(
     if left is None or operator is None:
         return clear_state()
 
-    display_value = float(display)
-    percentage_value = (
-        left * display_value / 100 if operator in {"add", "subtract"} else display_value / 100
-    )
+    percentage_value = float(display) / 100
     return resolve_operation(left, operator, format_number(percentage_value))
 
 
