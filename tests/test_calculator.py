@@ -30,6 +30,32 @@ def test_addition_cases(left: float, right: float, expected: float) -> None:
 
 
 @pytest.mark.parametrize(
+    ("left", "right", "expected"),
+    [
+        (-1, -1, 0),
+        (-1, 3, -4),
+        (1, -3, 4),
+        (5, 1, 4),
+        (0, 1, -1),
+        (999999, -10, 1000009),
+        (-999999, 10, -1000009),
+    ],
+    ids=[
+        "negative-minus-negative",
+        "negative-minus-positive",
+        "positive-minus-negative",
+        "positive-minus-positive",
+        "includes-zero",
+        "includes-maximum",
+        "includes-minimum",
+    ],
+)
+def test_subtraction_cases(left: float, right: float, expected: float) -> None:
+    """減算の代表的な入力値の組み合わせを計算できること"""
+    assert calculate(left, right, "subtract") == expected
+
+
+@pytest.mark.parametrize(
     ("left", "right", "operation_key", "expected"),
     [
         (1.5, 2.5, "add", 4.0),
