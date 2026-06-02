@@ -62,7 +62,7 @@ OPERATIONS: dict[str, Operation] = {
     "add": Operation(key="add", label="足し算", symbol="+", calculate=add),
     "subtract": Operation(key="subtract", label="引き算", symbol="-", calculate=subtract),
     "multiply": Operation(
-        key="multiply", label="掛け算", symbol="x", calculate=lambda _, right: right
+        key="multiply", label="掛け算", symbol="x", calculate=multiply
     ),
     "divide": Operation(key="divide", label="割り算", symbol="÷", calculate=divide),
 }
