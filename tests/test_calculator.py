@@ -1,6 +1,6 @@
 import pytest
 
-from training.calculator import calculate
+from training.calculator import CalculationOverflowError, DivisionByZeroError, calculate
 
 """
 加算のテスト
@@ -153,3 +153,48 @@ def test_decimal_cases(
 ) -> None:
     """小数を含む代表的な入力値の組み合わせを計算できること"""
     assert calculate(left, right, operation_key) == expected
+
+
+"""
+エラー分岐のテスト
+"""
+
+
+def test_div_by_0():
+    left = 5
+    right = 0
+
+    with pytest.raises(DivisionByZeroError):
+        calculate(left, right, "divide")
+
+
+def test_calculator_overflow_add():
+    left = 999999
+    right = 1
+
+    with pytest.raises(CalculationOverflowError):
+        calculate(left, right, "add")
+
+
+def test_calculator_overflow_subtract():
+    left = -999999
+    right = 1
+
+    with pytest.raises(CalculationOverflowError):
+        calculate(left, right, "subtract")
+
+
+def test_calculator_overflow_multiply():
+    left = 999999
+    right = 2
+
+    with pytest.raises(CalculationOverflowError):
+        calculate(left, right, "multiply")
+
+
+def test_calculator_overflow_division():
+    left = 999999
+    right = 0.5
+
+    with pytest.raises(CalculationOverflowError):
+        calculate(left, right, "divide")
