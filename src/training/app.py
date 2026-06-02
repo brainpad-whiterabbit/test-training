@@ -33,8 +33,14 @@ def format_expression(left: float, operator: str, right: str | None = None) -> s
     return f"{expression} {right}"
 
 
+def is_error_display(display: str) -> bool:
+    return display in {"Error", "Overflow"}
+
+
 def append_digit(display: str, digit: str) -> str:
     """数字ボタン押下後の表示値を返す。"""
+    if is_error_display(display):
+        return digit
     if display == "0":
         return digit
 
@@ -50,6 +56,8 @@ def append_digit(display: str, digit: str) -> str:
 
 def append_decimal(display: str) -> str:
     """小数点ボタン押下後の表示値を返す。"""
+    if is_error_display(display):
+        return "0."
     if "." in display:
         return display
 
@@ -58,7 +66,7 @@ def append_decimal(display: str) -> str:
 
 def toggle_sign(display: str) -> str:
     """符号反転ボタン押下後の表示値を返す。"""
-    if display == "0":
+    if is_error_display(display) or display == "0":
         return display
     if display.startswith("-"):
         return display[1:]
@@ -105,9 +113,9 @@ def resolve_operation_with_expression(
     try:
         result = calculate(left, float(display), operator)
     except DivisionByZeroError:
-        return None, None, "DivisionByZeroError", ""
+        return None, None, "Error", ""
     except CalculationOverflowError:
-        return None, None, "CalculationOverflowError", ""
+        return None, None, "Overflow", ""
 
     return None, None, format_number(result), format_expression(left, operator, display)
 

@@ -153,6 +153,34 @@ def test_equals_button_displays_calculation_result() -> None:
     assert display == "3"
 
 
+def test_zero_division_displays_error_message() -> None:
+    """0除算では入力欄に Error が表示されること"""
+    left, operator, display = resolve_operation(1.0, "divide", "0")
+
+    assert left is None
+    assert operator is None
+    assert display == "Error"
+
+
+def test_overflow_displays_overflow_message() -> None:
+    """計算結果が表示桁数を超える場合に入力欄に Overflow が表示されること"""
+    left, operator, display = resolve_operation(999999.0, "multiply", "2")
+
+    assert left is None
+    assert operator is None
+    assert display == "Overflow"
+
+
+def test_append_digit_resets_error_display() -> None:
+    """Error 表示中に数字入力すると新しい入力が始まること"""
+    assert append_digit("Error", "5") == "5"
+
+
+def test_append_decimal_resets_error_display_to_zero_decimal() -> None:
+    """Error 表示中に小数点入力すると 0. が始まること"""
+    assert append_decimal("Error") == "0."
+
+
 def test_clear_button_resets_formula_result_and_operation_state() -> None:
     """C 押下時に入力中の計算式、計算結果、演算状態を初期化できること"""
     left, operator, display = clear_state()
