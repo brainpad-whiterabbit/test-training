@@ -1,6 +1,6 @@
 import pytest
 
-from training.calculator import calculate
+from training.calculator import CalculationOverflowError, DivisionByZeroError, calculate
 
 
 @pytest.mark.parametrize(
@@ -88,3 +88,103 @@ def test_decimal_cases(
 def test_subtract_cases(left: float, right: float, expected: float) -> None:
     """減算の代表的な入力値の組み合わせを計算できること"""
     assert calculate(left, right, "subtract") == expected
+
+
+
+# ==============================================================================
+# 乗算（掛け算）のテスト
+# ==============================================================================
+@pytest.mark.parametrize(
+    ("left", "right", "expected"),
+    [
+        (-2, -3, 6),
+        (-2, 3, -6),
+        (2, -3, -6),
+        (2, 3, 6),
+        (999999, 0, 0),
+    ],
+    ids=[
+        "negative-multiply-negative",
+        "negative-multiply-positive",
+        "positive-multiply-negative",
+        "positive-multiply-positive",
+        "includes-zero",
+    ],
+)
+def test_multiplication_cases(left: float, right: float, expected: float) -> None:
+    """乗算の代表的な入力値の組み合わせを計算できること"""
+    # 正しい演算子名 "multiply" に戻しました
+    assert calculate(left, right, "multiply") == expected
+
+
+@pytest.mark.parametrize(
+    ("left", "right", "expected_exception"),
+    [
+        (999999, 2, CalculationOverflowError),
+        (-999999, 2, CalculationOverflowError),
+        (999999, 999999, CalculationOverflowError),
+        (-999999, -999999, CalculationOverflowError),
+    ],
+    ids=[
+        "over-maximum",
+        "under-minimum",
+        "maximum-multiply-maximum",
+        "minimum-multiply-minimum",
+    ],
+)
+def test_multiplication_overflow_cases(
+    left: float, right: float, expected_exception: type[BaseException]
+) -> None:
+    """乗算で値の範囲を超えた場合にCalculationOverflowErrorが発生すること"""
+    with pytest.raises(expected_exception):
+        calculate(left, right, "multiply")
+
+
+# ==============================================================================
+# 除算（割り算）のテスト
+# ==============================================================================
+@pytest.mark.parametrize(
+    ("left", "right", "expected"),
+    [
+        (-6, -2, 3),
+        (-6, 2, -3),
+        (6, -2, -3),
+        (6, 2, 3),
+        (3, 2, 1.5),
+        (0, 5, 0),
+        (999999, 1, 999999),
+        (-999999, 1, -999999),
+    ],
+    ids=[
+        "negative-divide-negative",
+        "negative-divide-positive",
+        "positive-divide-negative",
+        "positive-divide-positive",
+        "indivisible-float",
+        "divide-zero",
+        "includes-maximum",
+        "includes-minimum",
+    ],
+)
+def test_division_cases(left: float, right: float, expected: float) -> None:
+    """除算の代表的な入力値の組み合わせを計算できること"""
+    assert calculate(left, right, "divide") == expected
+
+
+@pytest.mark.parametrize(
+    ("left", "right", "expected_exception"),
+    [
+        (5, 0, DivisionByZeroError),
+        (-999999, -0.5, CalculationOverflowError),
+    ],
+    ids=[
+        "zero-division",
+        "over-maximum-by-division",
+    ],
+)
+def test_division_error_cases(
+    left: float, right: float, expected_exception: type[BaseException]
+) -> None:
+    """除算で不正な計算が行われた場合に適切な独自例外が発生すること"""
+    with pytest.raises(expected_exception):
+        calculate(left, right, "divide")
