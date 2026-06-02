@@ -219,3 +219,5 @@ def test_reload_does_not_keep_previous_operation_state() -> None:
     assert reloaded_state["left"] is None
     assert reloaded_state["operator"] is None
     assert reloaded_state["display"] == "0"
+
+
