@@ -98,7 +98,7 @@ def resolve_operation_with_expression(
     operator: str | None,
     display: str,
 ) -> tuple[float | None, str | None, str, str]:
-    """イコールボタン押下後の電卓状態と式表示値を返す。"""
+    """イコールボタン押下後の電卓状態と式表示値を返す（戻り値の数は元の4つのまま維持）。"""
     if left is None or operator is None:
         return left, operator, display, ""
 
@@ -135,7 +135,7 @@ def clear_entry(
 
 
 def initial_state() -> CalculatorState:
-    """ページ読み込み直後の電卓状態を返す。"""
+    """ページ読み込み直後の電卓状態を返す（元の辞書構造を維持して既存テストを通す）。"""
     return {"left": None, "operator": None, "display": "0"}
 
 
@@ -143,9 +143,13 @@ def render_state(
     display_label: TextLabel,
     expression_label: TextLabel,
     state: CalculatorState,
+    message_label: TextLabel | None = None,  # 既存の3引数呼び出しを壊さないよう末尾に配置
 ) -> None:
     """電卓状態を表示ラベルに反映する。"""
     display_label.set_text(str(state["display"]))
+    if message_label is not None:
+        message_label.set_text(str(state.get("message", "")))
+
     expression = state.get("expression")
     if isinstance(expression, str) and expression:
         expression_label.set_text(expression)
@@ -176,6 +180,9 @@ def create_app() -> None:
             ui.label("電卓Webアプリ").classes("text-sm font-semibold text-zinc-500")
             expression_label = ui.label("").classes("h-5 text-right text-sm text-zinc-500")
 
+        # F-12/F-14用の入力メッセージ欄
+        message_label = ui.label("").classes("h-5 text-sm text-red-600 font-bold w-full text-left")
+
         display_label = ui.label("0").classes(
             "w-full overflow-hidden rounded-lg border border-lime-950 bg-lime-200 px-5 py-6 "
             "text-right text-5xl font-mono font-semibold tracking-wider text-lime-950 "
@@ -183,7 +190,7 @@ def create_app() -> None:
         )
 
         def render() -> None:
-            render_state(display_label, expression_label, state)
+            render_state(display_label, expression_label, state, message_label)
 
         def clear() -> None:
             left, operator, display = clear_state()
@@ -191,6 +198,7 @@ def create_app() -> None:
             state["operator"] = operator
             state["display"] = display
             state["expression"] = ""
+            state["message"] = ""
             render()
 
         def clear_current_entry() -> None:
@@ -202,9 +210,11 @@ def create_app() -> None:
             state["operator"] = operator
             state["display"] = display
             state["expression"] = ""
+            state["message"] = ""
             render()
 
         def press_digit(digit: str) -> None:
+            state["message"] = ""
             display = str(state["display"])
             state["display"] = append_digit(display, digit)
             if not isinstance(state["operator"], str):
@@ -212,16 +222,19 @@ def create_app() -> None:
             render()
 
         def press_decimal() -> None:
+            state["message"] = ""
             display = str(state["display"])
             state["display"] = append_decimal(display)
             render()
 
         def press_sign_toggle() -> None:
+            state["message"] = ""
             display = str(state["display"])
             state["display"] = toggle_sign(display)
             render()
 
         def choose_operation(operation_key: str) -> None:
+            state["message"] = ""
             left, operator, display = select_operation(
                 state["left"] if isinstance(state["left"], float) else None,
                 state["operator"] if isinstance(state["operator"], str) else None,
@@ -242,11 +255,23 @@ def create_app() -> None:
             )
             state["left"] = left
             state["operator"] = operator
-            state["display"] = display
             state["expression"] = expression
+
+            # 【新仕様の翻訳処理】内部関数の戻り値からエラー表示を判定してstateを更新
+            if display == "DivisionByZeroError":
+                state["display"] = "0"
+                state["message"] = "Error"
+            elif display == "CalculationOverflowError":
+                state["display"] = "0"
+                state["message"] = "Overflow"
+            else:
+                state["display"] = display
+                state["message"] = ""
+
             render()
 
         def resolve_percentage() -> None:
+            state["message"] = ""
             left, operator, display = resolve_percentage_operation(
                 state["left"] if isinstance(state["left"], float) else None,
                 state["operator"] if isinstance(state["operator"], str) else None,
