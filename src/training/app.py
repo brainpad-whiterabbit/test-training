@@ -11,8 +11,8 @@ MAX_FRACTIONAL_DIGITS = 4
 BUTTON_CLASS = "h-14 w-full rounded-md text-xl font-semibold"
 NUMBER_BUTTON_COLOR = "blue"
 ACTION_BUTTON_COLOR = "grey-4"
-CLEAR_BUTTON_COLOR = "blue"
-OPERATOR_BUTTON_COLOR = "blue"
+CLEAR_BUTTON_COLOR = "red"
+OPERATOR_BUTTON_COLOR = "orange"
 
 type CalculatorState = dict[str, float | str | None]
 
@@ -313,24 +313,24 @@ def create_app() -> None:
 
         with ui.grid(columns=5).classes("w-full gap-2"):
             for label, handler in buttons:
-                if label.isdigit() or label == ".":
-                    button_color = NUMBER_BUTTON_COLOR
-                elif label in {"C", "CE"}:
-                    button_color = CLEAR_BUTTON_COLOR
-                elif label in {operation.symbol for operation in OPERATIONS.values()} | {
-                    "%",
-                    "=",
-                    "±",
-                }:
-                    button_color = OPERATOR_BUTTON_COLOR
-                else:
-                    button_color = ACTION_BUTTON_COLOR
+                button_color = determine_button_color(label)
 
                 button = ui.button(label, on_click=handler, color=button_color).classes(
                     BUTTON_CLASS
                 )
                 if button_color == ACTION_BUTTON_COLOR:
                     button.props("text-color=black")
+
+
+def determine_button_color(label: str) -> str:
+    """ラベルに応じたボタン色を返す（テスト用に切り出し）。"""
+    if label.isdigit() or label == ".":
+        return NUMBER_BUTTON_COLOR
+    if label in {"C", "CE"}:
+        return CLEAR_BUTTON_COLOR
+    if label in {operation.symbol for operation in OPERATIONS.values()} | {"%", "=", "±"}:
+        return OPERATOR_BUTTON_COLOR
+    return ACTION_BUTTON_COLOR
 
 
 if __name__ in {"__main__", "__mp_main__"}:

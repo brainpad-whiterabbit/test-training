@@ -253,6 +253,36 @@ def test_button_press_updates_display_within_one_second() -> None:
     assert elapsed_seconds < 1
 
 
+def test_button_color_mapping() -> None:
+    """ボタンラベルに応じて期待する色が返ること（NF-02）。"""
+    from training.app import (
+        ACTION_BUTTON_COLOR,
+        CLEAR_BUTTON_COLOR,
+        NUMBER_BUTTON_COLOR,
+        OPERATOR_BUTTON_COLOR,
+        determine_button_color,
+        OPERATIONS,
+    )
+
+    # 数字・小数点 -> 青
+    assert determine_button_color("0") == NUMBER_BUTTON_COLOR
+    assert determine_button_color(".") == NUMBER_BUTTON_COLOR
+
+    # クリア系 -> 赤
+    assert determine_button_color("C") == CLEAR_BUTTON_COLOR
+    assert determine_button_color("CE") == CLEAR_BUTTON_COLOR
+
+    # 演算子 -> オレンジ（演算子記号と特殊記号）
+    for op in OPERATIONS.values():
+        assert determine_button_color(op.symbol) == OPERATOR_BUTTON_COLOR
+    assert determine_button_color("=") == OPERATOR_BUTTON_COLOR
+    assert determine_button_color("%") == OPERATOR_BUTTON_COLOR
+    assert determine_button_color("±") == OPERATOR_BUTTON_COLOR
+
+    # その他 -> アクション色
+    assert determine_button_color("XYZ") == ACTION_BUTTON_COLOR
+
+
 def test_rapid_button_presses_update_display_without_delay() -> None:
     """高速連打でも表示遅延しないこと"""
     state: dict[str, float | str | None] = {"left": None, "operator": None, "display": "0"}
