@@ -40,6 +40,7 @@ def test_addition_cases(left: float, right: float, expected: float) -> None:
         (1, 1.5, "add", 2.5),
         (1.5, 1, "add", 2.5),
         (-1, -3, "subtract", -1 - (-3)),
+        (3.2, 0.2,"divide", 3.2 / 0.2),
     ],
     ids=[
         "positive-decimal-plus-positive-decimal",
@@ -50,6 +51,7 @@ def test_addition_cases(left: float, right: float, expected: float) -> None:
         "integer-plus-positive-decimal",
         "positive-decimal-plus-integer",
         "negative-integer-minus-negative-integer",
+        "positive-decimal-divided-by-positive-decimal",
     ],
 )
 def test_decimal_cases(
@@ -83,3 +85,31 @@ def test_decimal_cases(
 def test_subtraction_cases(left: float, right: float, expected: float) -> None:
     """減算の代表的な入力値の組み合わせを計算できること"""
     assert calculate(left, right, "subtract") == expected
+
+
+@pytest.mark.parametrize(
+    ("left", "right", "expected"),
+    [
+        (3, -3, -9),
+    ],
+    ids=[
+        "negative-times-negative",
+    ],
+)
+def test_multiplication_cases(left: float, right: float, expected: float) -> None:
+    """乗算の代表的な入力値の組み合わせを計算できること"""
+    assert calculate(left, right, "multiply") == expected
+
+
+@pytest.mark.parametrize(
+    ("left", "right", "expected"),
+    [
+        (4, 2, 2),
+    ],
+    ids=[
+        "positive-divided-by-positive",
+    ],
+)
+def test_division_cases(left: float, right: float, expected: float) -> None:
+    """除算の代表的な入力値の組み合わせを計算できること"""
+    assert calculate(left, right, "divide") == expected
