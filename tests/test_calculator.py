@@ -1,6 +1,6 @@
 import pytest
 
-from training.calculator import calculate
+from training.calculator import DivisionByZeroError, calculate
 
 
 @pytest.mark.parametrize(
@@ -52,6 +52,52 @@ def test_subtraction_cases(left: float, right: float, expected: float) -> None:
 
 
 @pytest.mark.parametrize(
+    ("left", "right", "expected"),
+    [
+        (2, 2, 4),
+        (-2, -2, 4),
+        (2, -2, -4),
+        (2, 0, 0),
+    ],
+    ids=[
+        "positive-times-positive",
+        "negative-times-negative",
+        "positive-times-negative",
+        "includes-zero",
+    ],
+)
+def test_multiplication_cases(left: float, right: float, expected: float) -> None:
+    """掛け算の代表的な入力値の組み合わせを計算できること"""
+    assert calculate(left, right, "multiply") == expected
+
+
+@pytest.mark.parametrize(
+    ("left", "right", "expected"),
+    [
+        (4, 2, 2),
+        (4, -2, -2),
+        (-4, 2, -2),
+        (0, 2, 0),
+    ],
+    ids=[
+        "positive-divide-positive",
+        "positive-divide-negative",
+        "negative-divide-positive",
+        "includes-zero",
+    ],
+)
+def test_division_cases(left: float, right: float, expected: float) -> None:
+    """割り算の代表的な入力値の組み合わせを計算できること"""
+    assert calculate(left, right, "divide") == expected
+
+
+def test_division_by_zero_raises_error() -> None:
+    """0 で割ると DivisionByZeroError が発生すること"""
+    with pytest.raises(DivisionByZeroError):
+        calculate(1, 0, "divide")
+
+
+@pytest.mark.parametrize(
     ("left", "right", "operation_key", "expected"),
     [
         (1.5, 2.5, "add", 4.0),
@@ -63,6 +109,8 @@ def test_subtraction_cases(left: float, right: float, expected: float) -> None:
         (1.5, 1, "add", 2.5),
         (1.5, 2.5, "subtract", -1.0),
         (1.5, -0.5, "subtract", 2.0),
+        (2, 0.25, "multiply", 0.5),
+        (0.5, 2, "divide", 0.25),
     ],
     ids=[
         "positive-decimal-plus-positive-decimal",
@@ -74,6 +122,8 @@ def test_subtraction_cases(left: float, right: float, expected: float) -> None:
         "positive-decimal-plus-integer",
         "positive-decimal-minus-positive-decimal",
         "positive-decimal-minus-negative-decimal",
+        "integer-times-decimal",
+        "decimal-divide-integer",
     ],
 )
 def test_decimal_cases(
