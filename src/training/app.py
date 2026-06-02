@@ -22,7 +22,7 @@ class TextLabel(Protocol):
 
 
 def format_number(value: float) -> str:
-    return f"{value:g}"
+    return f"{value:.10g}"
 
 
 def format_expression(left: float, operator: str, right: str | None = None) -> str:

@@ -171,6 +171,90 @@ def test_clear_entry_resets_display_and_keeps_operation_state() -> None:
     assert display == "0"
 
 
+def test_division_by_zero_displays_error() -> None:
+    """0除算時にエラー表示ができること"""
+    left, operator, display, expression = resolve_operation_with_expression(5.0, "divide", "0")
+
+    assert left is None
+    assert operator is None
+    assert display == "DivisionByZeroError"
+    assert expression == ""
+
+
+def test_error_recovery_after_division_by_zero_with_clear() -> None:
+    """Error 後に C で正常操作へ復帰できること"""
+    left, operator, display, _expression = resolve_operation_with_expression(5.0, "divide", "0")
+    assert display == "DivisionByZeroError"
+
+    left, operator, display = clear_state()
+
+    assert left is None
+    assert operator is None
+    assert display == "0"
+
+
+def test_error_recovery_after_division_by_zero_with_clear_entry() -> None:
+    """Error 後に CE で正常操作へ復帰できること"""
+    left, operator, display, _expression = resolve_operation_with_expression(5.0, "divide", "0")
+    assert display == "DivisionByZeroError"
+
+    left, operator, display = clear_entry(None, None)
+
+    assert left is None
+    assert operator is None
+    assert display == "0"
+
+
+def test_calculation_overflow_displays_error() -> None:
+    """計算結果が表示上限を超えた場合に Overflow 表示できること"""
+    left, operator, display, expression = resolve_operation_with_expression(
+        999999.9999, "add", "0.0001"
+    )
+
+    assert left is None
+    assert operator is None
+    assert display == "CalculationOverflowError"
+    assert expression == ""
+
+
+def test_error_recovery_after_overflow_with_clear_state() -> None:
+    """Overflow 後に C で正常操作へ復帰できること"""
+    left, operator, display, _expression = resolve_operation_with_expression(
+        999999.9999, "add", "0.0001"
+    )
+    assert display == "CalculationOverflowError"
+
+    left, operator, display = clear_state()
+
+    assert left is None
+    assert operator is None
+    assert display == "0"
+
+
+def test_error_recovery_after_overflow_with_clear_entry() -> None:
+    """Overflow 後に CE で正常操作へ復帰できること"""
+    left, operator, display, _expression = resolve_operation_with_expression(
+        999999.9999, "add", "0.0001"
+    )
+    assert display == "CalculationOverflowError"
+
+    left, operator, display = clear_entry(None, None)
+
+    assert left is None
+    assert operator is None
+    assert display == "0"
+
+
+def test_result_rounds_to_three_decimal_places() -> None:
+    """計算結果の小数部が4桁を超える場合に表示可能な桁数へ丸められること"""
+    left, operator, display, expression = resolve_operation_with_expression(1.0, "divide", "3")
+
+    assert left is None
+    assert operator is None
+    assert display == "0.333"
+    assert expression == "1 ÷ 3"
+
+
 def test_button_press_updates_display_within_one_second() -> None:
     """ボタン押下後1秒以内に画面更新されること"""
     state: dict[str, float | str | None] = {"left": None, "operator": None, "display": "0"}
