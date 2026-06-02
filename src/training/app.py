@@ -117,8 +117,31 @@ def resolve_percentage_operation(
     operator: str | None,
     display: str,
 ) -> tuple[float | None, str | None, str]:
-    """パーセントボタン押下後の電卓状態を返す。"""
-    return clear_state()
+    """パーセントボタン押下後の電卓状態を返す"""
+
+    # 【F-17】「入力2」の状態ではない場合（leftまたはoperatorが空）は、状態をクリアする
+    if left is None or operator is None:
+        return clear_state()
+
+    input1 = left
+    input2 = float(display)
+
+    # 【F-18】演算子に応じた分岐計算
+    if operator in ("add", "subtract"):
+        # 加減算の公式: 入力1 演算子 (左辺 × 右辺 ÷ 100)
+        percentage_value = input1 * input2 / 100
+        result = calculate(input1, percentage_value, operator)
+
+    elif operator in ("multiply", "divide"):
+        # 乗除算の公式: 入力1 計算記号 (入力2 ÷ 100)
+        percentage_value = input2 / 100
+        result = calculate(input1, percentage_value, operator)
+
+    else:
+        return clear_state()
+
+    # 計算結果を画面に表示し、左辺の数値と演算子はクリアする
+    return None, None, format_number(result)
 
 
 def clear_state() -> tuple[None, None, str]:
