@@ -105,9 +105,9 @@ def resolve_operation_with_expression(
     try:
         result = calculate(left, float(display), operator)
     except DivisionByZeroError:
-        return None, None, "DivisionByZeroError", ""
+        return None, None, "Error", ""
     except CalculationOverflowError:
-        return None, None, "CalculationOverflowError", ""
+        return None, None, "Overflow", ""
 
     return None, None, format_number(result), format_expression(left, operator, display)
 
