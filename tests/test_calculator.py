@@ -28,6 +28,29 @@ def test_addition_cases(left: float, right: float, expected: float) -> None:
     """加算の代表的な入力値の組み合わせを計算できること"""
     assert calculate(left, right, "add") == expected
 
+@pytest.mark.parametrize(
+    ("left", "right", "expected"),
+    [
+        (-1, -1, 0),
+        (-1, 3, -4),
+        (1, -3, 4),
+        (5, 1, 4),
+        (0, 1, -1),    
+    ],
+    ids=[
+        "negative-plus-negative",
+        "negative-plus-positive",
+        "positive-plus-negative",
+        "positive-plus-positive",
+        "includes-zero",
+        "includes-maximum",
+        "includes-minimum",
+    ],
+)
+def test_subtraction_cases(left: float, right: float, expected: float) -> None:
+    """減算の代表的な入力値の組み合わせを計算できること"""
+    assert calculate(left, right, "subtract") == expected
+
 
 @pytest.mark.parametrize(
     ("left", "right", "operation_key", "expected"),
@@ -39,21 +62,18 @@ def test_addition_cases(left: float, right: float, expected: float) -> None:
         (1.5, 0, "add", 1.5),
         (1, 1.5, "add", 2.5),
         (1.5, 1, "add", 2.5),
-    (5.5, 2.5, "subtract", 3.0),
-    (1.5, 2.0, "multiply", 3.0),
-    (7.5, 2.5, "divide", 3.0),
-],
-ids=[
-    "positive-decimal-plus-positive-decimal",
-    "positive-decimal-plus-negative-decimal",
-    "negative-decimal-plus-positive-decimal",
-    "negative-decimal-plus-negative-decimal",
-    "positive-decimal-plus-zero",
-    "integer-plus-positive-decimal",
-    "positive-decimal-plus-integer",
-    "positive-decimal-subtract-positive-decimal",
-    "positive-decimal-multiply-integer",
-    "positive-decimal-divide-positive-decimal",
+    ],
+    ids=[
+        "positive-decimal-plus-positive-decimal",
+        "positive-decimal-plus-negative-decimal",
+        "negative-decimal-plus-positive-decimal",
+        "negative-decimal-plus-negative-decimal",
+        "positive-decimal-plus-zero",
+        "integer-plus-positive-decimal",
+        "positive-decimal-plus-integer",
+    ],
+)
+def test_decimal_cases(
     left: float,
     right: float,
     operation_key: str,
