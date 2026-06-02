@@ -118,7 +118,18 @@ def resolve_percentage_operation(
     display: str,
 ) -> tuple[float | None, str | None, str]:
     """パーセントボタン押下後の電卓状態を返す。"""
-    return clear_state()
+    if left is None:
+        return left, operator, display
+
+    try:
+        # percentage: left * (display / 100)
+        percent_value = calculate(left, float(display) / 100.0, "multiply")
+    except DivisionByZeroError:
+        return None, None, "DivisionByZeroError"
+    except CalculationOverflowError:
+        return None, None, "CalculationOverflowError"
+
+    return None, None, format_number(percent_value)
 
 
 def clear_state() -> tuple[None, None, str]:

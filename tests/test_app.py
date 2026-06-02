@@ -11,6 +11,7 @@ from training.app import (
     render_state,
     resolve_operation,
     resolve_operation_with_expression,
+    resolve_percentage_operation,
     select_operation,
     toggle_sign,
 )
@@ -118,6 +119,33 @@ def test_expression_display_shows_full_expression_after_successful_calculation()
 
     assert display_label.text == "15"
     assert expression_label.text == "12 + 3"
+
+
+def test_percentage_button_calculates_ratio() -> None:
+    """`%` 押下時に入力1に対する入力2の割合を計算できること"""
+    left, operator, display = resolve_percentage_operation(200.0, "previous", "50")
+
+    assert left is None
+    assert operator is None
+    assert display == "100"
+
+
+def test_percentage_button_handles_decimal_input() -> None:
+    """小数値を含む入力でも割合を計算できること"""
+    left, operator, display = resolve_percentage_operation(1.5, "previous", "50")
+
+    assert left is None
+    assert operator is None
+    assert display == "0.75"
+
+
+def test_percentage_button_zero_and_hundred_percent() -> None:
+    """0% および 100% の境界ケースを正しく処理すること"""
+    _, _, display_zero = resolve_percentage_operation(100.0, "previous", "0")
+    _, _, display_hundred = resolve_percentage_operation(100.0, "previous", "100")
+
+    assert display_zero == "0"
+    assert display_hundred == "100"
 
 
 def test_consecutive_operation_input_overwrites_previous_operator() -> None:
