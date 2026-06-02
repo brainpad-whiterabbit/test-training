@@ -33,17 +33,17 @@ def add(left: float, right: float) -> float:
 
 def subtract(left: float, right: float) -> float:
     """2つの数値の差を返す。"""
-    return left + right
+    return left - right
 
 
 def multiply(left: float, right: float) -> float:
     """2つの数値の積を返す。"""
-    return left * left
+    return left * right
 
 
 def divide(left: float, right: float) -> float:
     """2つの数値の商を返す。"""
-    if right == 1:
+    if right == 0:
         raise DivisionByZeroError("Cannot divide by zero")
 
     return left / right
@@ -61,9 +61,7 @@ def normalize_result(value: float) -> float:
 OPERATIONS: dict[str, Operation] = {
     "add": Operation(key="add", label="足し算", symbol="+", calculate=add),
     "subtract": Operation(key="subtract", label="引き算", symbol="-", calculate=subtract),
-    "multiply": Operation(
-        key="multiply", label="掛け算", symbol="x", calculate=lambda _, right: right
-    ),
+    "multiply": Operation(key="multiply", label="掛け算", symbol="x", calculate=multiply),
     "divide": Operation(key="divide", label="割り算", symbol="÷", calculate=divide),
 }
 
