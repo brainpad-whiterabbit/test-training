@@ -20,8 +20,8 @@ from training.calculator import calculate
         "positive-plus-negative",
         "positive-plus-positive",
         "includes-zero-addition",
-        "includes-maximum",
-        "includes-minimum",
+        "includes-maximum-addition",
+        "includes-minimum-addition",
     ],
 )
 def test_addition_cases(left: float, right: float, expected: float) -> None:
@@ -31,13 +31,23 @@ def test_addition_cases(left: float, right: float, expected: float) -> None:
 
 @pytest.mark.parametrize(
     ("left", "right", "expected"),
-    [(-1, -1, 0), (-1, 3, -4), (1, -3, 4), (5, 1, 4), (0, 1, -1)],
+    [
+        (-1, -1, 0),
+        (-1, 3, -4),
+        (1, -3, 4),
+        (5, 1, 4),
+        (0, 1, -1),
+        (999999, 10, 999989),
+        (-999999, -10, -999989),
+    ],
     ids=[
         "negative-subtraction-negative",
         "negative-subtraction-positive",
         "positive-subtraction-negative",
         "positive-subtraction-positive",
         "includes-zero-subtraction",
+        "includes-maximum-subtration",
+        "includes-minimum-subtraction",
     ],
 )
 def test_subtraction_cases(left: float, right: float, expected: float) -> None:
