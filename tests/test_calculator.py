@@ -1,6 +1,6 @@
 import pytest
 
-from training.calculator import CalculationOverflowError, calculate
+from training.calculator import CalculationOverflowError, DivisionByZeroError, calculate
 
 
 @pytest.mark.parametrize(
@@ -113,4 +113,89 @@ def test_decimal_cases(
     expected: float,
 ) -> None:
     """小数を含む代表的な入力値の組み合わせを計算できること"""
+    assert calculate(left, right, operation_key) == expected
+
+
+@pytest.mark.parametrize(
+    ("left", "right", "expected"),
+    [
+        (-2, -3, 6),
+        (-2, 3, -6),
+        (2, 3, 6),
+        (5, 0, 0),
+        (5, 1, 5),
+        (2.5, 2.0, 5.0),
+        (-1.5, 2.0, -3.0),
+    ],
+    ids=[
+        "negative-times-negative",
+        "negative-times-positive",
+        "positive-times-positive",
+        "multiply-by-zero",
+        "multiply-by-one",
+        "decimal-multiplication",
+        "negative-decimal-multiplication",
+    ],
+)
+def test_multiplication_cases(left: float, right: float, expected: float) -> None:
+    """乗算の代表的な入力値の組み合わせを計算できること"""
+    assert calculate(left, right, "multiply") == expected
+
+
+@pytest.mark.parametrize(
+    ("left", "right", "expected"),
+    [
+        (-6, -2, 3),
+        (-6, 2, -3),
+        (6, -2, -3),
+        (6, 2, 3),
+        (0, 5, 0),
+        (5.0, 2.0, 2.5),
+        (-3.0, 2.0, -1.5),
+    ],
+    ids=[
+        "negative-divide-negative",
+        "negative-divide-positive",
+        "positive-divide-negative",
+        "positive-divide-positive",
+        "zero-divide-by-number",
+        "decimal-division",
+        "negative-decimal-division",
+    ],
+)
+def test_division_cases(left: float, right: float, expected: float) -> None:
+    """除算の代表的な入力値の組み合わせを計算できること"""
+    assert calculate(left, right, "divide") == expected
+
+
+def test_division_by_zero_raises_error() -> None:
+    """0で除算するとエラーが発生すること"""
+    with pytest.raises(DivisionByZeroError):
+        calculate(5, 0, "divide")
+
+
+@pytest.mark.parametrize(
+    ("left", "right", "operation_key", "expected"),
+    [
+        (2.5, 2.0, "multiply", 5.0),
+        (5.0, 2.0, "divide", 2.5),
+        (0.1, 3, "multiply", 0.3),
+        (1.5, 2.0, "subtract", -0.5),
+        (1.5, 2.0, "add", 3.5),
+    ],
+    ids=[
+        "decimal-multiplication",
+        "decimal-division",
+        "floating-point-precision",
+        "decimal-subtraction",
+        "decimal-addition",
+    ],
+)
+def test_decimal_operations(
+    left: float,
+    right: float,
+    operation_key: str,
+    expected: float,
+) -> None:
+    """小数を含む四則演算を計算できること"""
     assert calculate(left, right, operation_key) == expected
