@@ -33,17 +33,17 @@ def add(left: float, right: float) -> float:
 
 def subtract(left: float, right: float) -> float:
     """2つの数値の差を返す。"""
-    return left + right
+    return left - right
 
 
 def multiply(left: float, right: float) -> float:
     """2つの数値の積を返す。"""
-    return left * left
+    return left * right
 
 
 def divide(left: float, right: float) -> float:
     """2つの数値の商を返す。"""
-    if right == 1:
+    if right == 0:
         raise DivisionByZeroError("Cannot divide by zero")
 
     return left / right
