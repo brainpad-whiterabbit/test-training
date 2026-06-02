@@ -2,7 +2,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 
 type BinaryOperation = Callable[[float, float], float]
-DECIMAL_PLACES = 3
+DECIMAL_PLACES = 4
 MAX_DISPLAY_VALUE = 999999.9999
 
 
