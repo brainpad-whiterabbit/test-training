@@ -53,6 +53,56 @@ def test_subtract_cases(left: float, right: float, expected: float) -> None:
     """減算の代表的な入力値の組み合わせを計算できること"""
     assert calculate(left, right, "subtract") == expected
 
+@pytest.mark.parametrize(
+    ("left", "right", "expected"),
+    [
+        (-1, -3, 3),
+        (-1, 1, -1),
+        (1, -1, -1),
+        (1, 4, 4),
+        (0, 1, 0),
+        (999999, 1, 999999),
+        (-999999, 1, -999999),
+    ],
+    ids=[
+        "negative-plus-negative",
+        "negative-plus-positive",
+        "positive-plus-negative",
+        "positive-plus-positive",
+        "includes-zero",
+        "includes-maximum",
+        "includes-minimum",
+    ],
+)
+def test_multiply_cases(left: float, right: float, expected: float) -> None:
+    """乗算の代表的な入力値の組み合わせを計算できること"""
+    assert calculate(left, right, "multiply") == expected
+
+@pytest.mark.parametrize(
+    ("left", "right", "expected"),
+    [
+        (-4, -1, 4),
+        (-1, 1, -1),
+        (1, -1, -1),
+        (12, 4 , 3),
+        (0, 1, 0),
+        (999999, 1, 999999),
+        (-999999, 1, -999999),
+    ],
+    ids=[
+        "negative-plus-negative",
+        "negative-plus-positive",
+        "positive-plus-negative",
+        "positive-plus-positive",
+        "includes-zero",
+        "includes-maximum",
+        "includes-minimum",
+    ],
+)
+def test_divide_cases(left: float, right: float, expected: float) -> None:
+    """除算の代表的な入力値の組み合わせを計算できること"""
+    assert calculate(left, right, "divide") == expected
+
 
 @pytest.mark.parametrize(
     ("left", "right", "operation_key", "expected"),
