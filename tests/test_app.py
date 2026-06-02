@@ -60,6 +60,7 @@ def test_decimal_button_from_initial_zero_can_create_decimal_value() -> None:
         ("1.999", "9", "1.9999"),
         ("1.9999", "9", "1.9999"),
         ("123456", "7", "123456"),
+        ("999999", "1", "999999"),
         ("0.1234", "5", "0.1234"),
     ],
     ids=[
@@ -70,6 +71,7 @@ def test_decimal_button_from_initial_zero_can_create_decimal_value() -> None:
         "fractional-part-allows-four-digits",
         "fractional-part-rejects-fifth-digit",
         "keeps-display-when-integer-limit-exceeded",
+        "keeps-display-when-integer-limit-exceeded-with-maximum-value",
         "keeps-display-when-fractional-limit-exceeded",
     ],
 )
@@ -151,6 +153,28 @@ def test_equals_button_displays_calculation_result() -> None:
     assert left is None
     assert operator is None
     assert display == "3"
+
+
+def test_division_by_zero_displays_error_message() -> None:
+    """0除算時にエラー表示できること"""
+    left, operator, display, expression = resolve_operation_with_expression(5.0, "divide", "0")
+
+    assert left is None
+    assert operator is None
+    assert display == "DivisionByZeroError"
+    assert expression == ""
+
+
+def test_overflow_displays_error_message() -> None:
+    """Overflow時に入力欄にエラー表示できること"""
+    left, operator, display, expression = resolve_operation_with_expression(
+        999999.99, "subtract", "-1.0"
+    )
+
+    assert left is None
+    assert operator is None
+    assert display == "CalculationOverflowError"
+    assert expression == ""
 
 
 def test_clear_button_resets_formula_result_and_operation_state() -> None:

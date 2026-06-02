@@ -80,9 +80,9 @@ def test_subtraction_boundary_and_precision_cases(
 
 
 def test_subtraction_overflow_raises_error() -> None:
-    """最小値を含む減算でオーバーフローが発生すること"""
+    """Overflow時にオーバーフロー例外が発生すること"""
     with pytest.raises(CalculationOverflowError):
-        calculate(-999999.99, 1.0, "subtract")
+        calculate(999999.99, -1.0, "subtract")
 
 
 @pytest.mark.parametrize(
