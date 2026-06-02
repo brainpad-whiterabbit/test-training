@@ -2,6 +2,10 @@ import pytest
 
 from training.calculator import calculate
 
+"""
+加算のテスト
+"""
+
 
 @pytest.mark.parametrize(
     ("left", "right", "expected"),
@@ -29,6 +33,11 @@ def test_addition_cases(left: float, right: float, expected: float) -> None:
     assert calculate(left, right, "add") == expected
 
 
+"""
+減算のテスト
+"""
+
+
 @pytest.mark.parametrize(
     ("left", "right", "expected"),
     [
@@ -53,6 +62,56 @@ def test_addition_cases(left: float, right: float, expected: float) -> None:
 def test_subtraction_cases(left: float, right: float, expected: float) -> None:
     """減算の代表的な入力値の組み合わせを計算できること"""
     assert calculate(left, right, "subtract") == expected
+
+
+"""
+乗算のテスト
+"""
+
+
+@pytest.mark.parametrize(
+    ("left", "right", "expected"),
+    [
+        (2, 3, 6),
+        (-2, 3, -6),
+        (-2, -3, 6),
+        (-2, 0, 0),
+    ],
+    ids=[
+        "positive-multiply-positive",
+        "negative-multiply-positive",
+        "negative-multiply-negative",
+        "includes-zero-multiply",
+    ],
+)
+def test_multiplication_cases(left: float, right: float, expected: float) -> None:
+    """乗算の代表的な入力値の組み合わせを計算できること"""
+    assert calculate(left, right, "multiply") == expected
+
+
+"""
+除算のテスト
+"""
+
+
+@pytest.mark.parametrize(
+    ("left", "right", "expected"),
+    [(6, 2, 3), (6, -3, -2), (-6, -3, 2), (0, 5, 0)],
+    ids=[
+        "positive-divide-positive",
+        "positive-divide-negative",
+        "negative-divide-negative",
+        "includes-zero-integer",
+    ],
+)
+def test_divide_cases(left: float, right: float, expected: float) -> None:
+    """除算の代表的な入力値の組み合わせを計算できること"""
+    assert calculate(left, right, "divide") == expected
+
+
+"""
+小数点数計算のテスト
+"""
 
 
 @pytest.mark.parametrize(
