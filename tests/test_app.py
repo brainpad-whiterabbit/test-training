@@ -11,6 +11,7 @@ from training.app import (
     render_state,
     resolve_operation,
     resolve_operation_with_expression,
+    resolve_percentage_operation,
     select_operation,
     toggle_sign,
 )
@@ -153,6 +154,72 @@ def test_equals_button_displays_calculation_result() -> None:
     assert display == "3"
 
 
+def test_zero_division_displays_error_message() -> None:
+    """0除算では入力欄に Error が表示されること"""
+    left, operator, display = resolve_operation(1.0, "divide", "0")
+
+    assert left is None
+    assert operator is None
+    assert display == "Error"
+
+
+def test_overflow_displays_overflow_message() -> None:
+    """計算結果が表示桁数を超える場合に入力欄に Overflow が表示されること"""
+    left, operator, display = resolve_operation(999999.0, "multiply", "2")
+
+    assert left is None
+    assert operator is None
+    assert display == "Overflow"
+
+
+def test_append_digit_resets_error_display() -> None:
+    """Error 表示中に数字入力すると新しい入力が始まること"""
+    assert append_digit("Error", "5") == "5"
+
+
+def test_append_decimal_resets_error_display_to_zero_decimal() -> None:
+    """Error 表示中に小数点入力すると 0. が始まること"""
+    assert append_decimal("Error") == "0."
+
+
+def test_percentage_clears_when_not_input2() -> None:
+    """入力2以外で%押下時にクリアされること"""
+    left, operator, display = resolve_percentage_operation(None, None, "5")
+
+    assert left is None
+    assert operator is None
+    assert display == "0"
+
+
+def test_percentage_add_sub_rule() -> None:
+    """[入力1, +/-, 入力2, %] の場合に左辺×右辺÷100 が計算されること"""
+    left, operator, display = resolve_percentage_operation(200.0, "add", "10")
+
+    assert left is None
+    assert operator is None
+    assert display == "220"
+
+
+def test_percentage_multiply_divide_rule() -> None:
+    """[入力1, x/, 入力2, %] の場合に右辺÷100 が計算されること"""
+    # multiply: 200 * (10/100) = 20
+    _, _, display_mul = resolve_percentage_operation(200.0, "multiply", "10")
+    assert display_mul == "20"
+
+    # divide: 200 / (10/100) = 2000
+    _, _, display_div = resolve_percentage_operation(200.0, "divide", "10")
+    assert display_div == "2000"
+
+
+def test_percentage_divide_by_zero_shows_error() -> None:
+    """[入力1, /, 0, %] で Error が表示されること"""
+    left, operator, display = resolve_percentage_operation(200.0, "divide", "0")
+
+    assert left is None
+    assert operator is None
+    assert display == "Error"
+
+
 def test_clear_button_resets_formula_result_and_operation_state() -> None:
     """C 押下時に入力中の計算式、計算結果、演算状態を初期化できること"""
     left, operator, display = clear_state()
@@ -184,6 +251,36 @@ def test_button_press_updates_display_within_one_second() -> None:
 
     assert display_label.text == "1"
     assert elapsed_seconds < 1
+
+
+def test_button_color_mapping() -> None:
+    """ボタンラベルに応じて期待する色が返ること（NF-02）。"""
+    from training.app import (
+        ACTION_BUTTON_COLOR,
+        CLEAR_BUTTON_COLOR,
+        NUMBER_BUTTON_COLOR,
+        OPERATOR_BUTTON_COLOR,
+        determine_button_color,
+        OPERATIONS,
+    )
+
+    # 数字・小数点 -> 青
+    assert determine_button_color("0") == NUMBER_BUTTON_COLOR
+    assert determine_button_color(".") == NUMBER_BUTTON_COLOR
+
+    # クリア系 -> 赤
+    assert determine_button_color("C") == CLEAR_BUTTON_COLOR
+    assert determine_button_color("CE") == CLEAR_BUTTON_COLOR
+
+    # 演算子 -> オレンジ（演算子記号と特殊記号）
+    for op in OPERATIONS.values():
+        assert determine_button_color(op.symbol) == OPERATOR_BUTTON_COLOR
+    assert determine_button_color("=") == OPERATOR_BUTTON_COLOR
+    assert determine_button_color("%") == OPERATOR_BUTTON_COLOR
+    assert determine_button_color("±") == OPERATOR_BUTTON_COLOR
+
+    # その他 -> アクション色
+    assert determine_button_color("XYZ") == ACTION_BUTTON_COLOR
 
 
 def test_rapid_button_presses_update_display_without_delay() -> None:

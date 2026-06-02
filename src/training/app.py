@@ -11,8 +11,8 @@ MAX_FRACTIONAL_DIGITS = 4
 BUTTON_CLASS = "h-14 w-full rounded-md text-xl font-semibold"
 NUMBER_BUTTON_COLOR = "blue"
 ACTION_BUTTON_COLOR = "grey-4"
-CLEAR_BUTTON_COLOR = "blue"
-OPERATOR_BUTTON_COLOR = "blue"
+CLEAR_BUTTON_COLOR = "red"
+OPERATOR_BUTTON_COLOR = "orange"
 
 type CalculatorState = dict[str, float | str | None]
 
@@ -22,7 +22,7 @@ class TextLabel(Protocol):
 
 
 def format_number(value: float) -> str:
-    return f"{value:g}"
+    return f"{value:.10g}"
 
 
 def format_expression(left: float, operator: str, right: str | None = None) -> str:
@@ -33,8 +33,14 @@ def format_expression(left: float, operator: str, right: str | None = None) -> s
     return f"{expression} {right}"
 
 
+def is_error_display(display: str) -> bool:
+    return display in {"Error", "Overflow"}
+
+
 def append_digit(display: str, digit: str) -> str:
     """数字ボタン押下後の表示値を返す。"""
+    if is_error_display(display):
+        return digit
     if display == "0":
         return digit
 
@@ -50,6 +56,8 @@ def append_digit(display: str, digit: str) -> str:
 
 def append_decimal(display: str) -> str:
     """小数点ボタン押下後の表示値を返す。"""
+    if is_error_display(display):
+        return "0."
     if "." in display:
         return display
 
@@ -58,7 +66,7 @@ def append_decimal(display: str) -> str:
 
 def toggle_sign(display: str) -> str:
     """符号反転ボタン押下後の表示値を返す。"""
-    if display == "0":
+    if is_error_display(display) or display == "0":
         return display
     if display.startswith("-"):
         return display[1:]
@@ -105,9 +113,9 @@ def resolve_operation_with_expression(
     try:
         result = calculate(left, float(display), operator)
     except DivisionByZeroError:
-        return None, None, "DivisionByZeroError", ""
+        return None, None, "Error", ""
     except CalculationOverflowError:
-        return None, None, "CalculationOverflowError", ""
+        return None, None, "Overflow", ""
 
     return None, None, format_number(result), format_expression(left, operator, display)
 
@@ -118,7 +126,29 @@ def resolve_percentage_operation(
     display: str,
 ) -> tuple[float | None, str | None, str]:
     """パーセントボタン押下後の電卓状態を返す。"""
-    return clear_state()
+    # 非入力2の状態ではクリアする
+    if left is None or operator is None:
+        return clear_state()
+
+    try:
+        right = float(display)
+
+        # [入力1, + または -, 入力2, %] -> 入力1 演算子 (左辺 × 右辺 ÷ 100))
+        if operator in {"add", "subtract"}:
+            percent_value = left * right / 100
+            result = calculate(left, percent_value, operator)
+
+        # [入力1, x または /, 入力2, %] -> 入力1 計算記号 (入力2 ÷ 100)
+        else:
+            divisor = right / 100
+            result = calculate(left, divisor, operator)
+
+    except DivisionByZeroError:
+        return None, None, "Error"
+    except CalculationOverflowError:
+        return None, None, "Overflow"
+
+    return None, None, format_number(result)
 
 
 def clear_state() -> tuple[None, None, str]:
@@ -283,24 +313,24 @@ def create_app() -> None:
 
         with ui.grid(columns=5).classes("w-full gap-2"):
             for label, handler in buttons:
-                if label.isdigit() or label == ".":
-                    button_color = NUMBER_BUTTON_COLOR
-                elif label in {"C", "CE"}:
-                    button_color = CLEAR_BUTTON_COLOR
-                elif label in {operation.symbol for operation in OPERATIONS.values()} | {
-                    "%",
-                    "=",
-                    "±",
-                }:
-                    button_color = OPERATOR_BUTTON_COLOR
-                else:
-                    button_color = ACTION_BUTTON_COLOR
+                button_color = determine_button_color(label)
 
                 button = ui.button(label, on_click=handler, color=button_color).classes(
                     BUTTON_CLASS
                 )
                 if button_color == ACTION_BUTTON_COLOR:
                     button.props("text-color=black")
+
+
+def determine_button_color(label: str) -> str:
+    """ラベルに応じたボタン色を返す（テスト用に切り出し）。"""
+    if label.isdigit() or label == ".":
+        return NUMBER_BUTTON_COLOR
+    if label in {"C", "CE"}:
+        return CLEAR_BUTTON_COLOR
+    if label in {operation.symbol for operation in OPERATIONS.values()} | {"%", "=", "±"}:
+        return OPERATOR_BUTTON_COLOR
+    return ACTION_BUTTON_COLOR
 
 
 if __name__ in {"__main__", "__mp_main__"}:
