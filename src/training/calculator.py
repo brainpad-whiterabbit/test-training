@@ -43,7 +43,7 @@ def multiply(left: float, right: float) -> float:
 
 def divide(left: float, right: float) -> float:
     """2つの数値の商を返す。"""
-    if right == 1:
+    if right == 0:
         raise DivisionByZeroError("Cannot divide by zero")
 
     return left / right
