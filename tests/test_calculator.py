@@ -58,3 +58,34 @@ def test_decimal_cases(
 ) -> None:
     """小数を含む代表的な入力値の組み合わせを計算できること"""
     assert calculate(left, right, operation_key) == expected
+
+
+@pytest.mark.parametrize(
+    ("left", "right", "operation_key", "expected"),
+    [
+        (1.5, 2.5, "subtract", -1.0),
+        (1.5, -0.5, "subtract", 2.0),
+        (-1.5, 0.5, "subtract", -2.0),
+        (-1.5, -2.5, "subtract", 1.0),
+        (1.5, 0, "subtract", 1.5),
+        (1, 1.5, "subtract", -0.5),
+        (1.5, 1, "subtract", 0.5),
+    ],
+    ids=[
+        "positive-decimal-minus-positive-decimal",
+        "positive-decimal-minus-negative-decimal",
+        "negative-decimal-minus-positive-decimal",
+        "negative-decimal-minus-negative-decimal",
+        "positive-decimal-minus-zero",
+        "integer-minus-positive-decimal",
+        "positive-decimal-minus-integer",
+    ],
+)
+def test_decimal_subtraction_cases(
+    left: float,
+    right: float,
+    operation_key: str,
+    expected: float,
+) -> None:
+    """小数を含む減算の入力値の組み合わせを計算できること"""
+    assert calculate(left, right, operation_key) == expected
