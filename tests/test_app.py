@@ -11,6 +11,7 @@ from training.app import (
     render_state,
     resolve_operation,
     resolve_operation_with_expression,
+    resolve_percentage_operation,
     select_operation,
     toggle_sign,
 )
@@ -179,6 +180,44 @@ def test_append_digit_resets_error_display() -> None:
 def test_append_decimal_resets_error_display_to_zero_decimal() -> None:
     """Error 表示中に小数点入力すると 0. が始まること"""
     assert append_decimal("Error") == "0."
+
+
+def test_percentage_clears_when_not_input2() -> None:
+    """入力2以外で%押下時にクリアされること"""
+    left, operator, display = resolve_percentage_operation(None, None, "5")
+
+    assert left is None
+    assert operator is None
+    assert display == "0"
+
+
+def test_percentage_add_sub_rule() -> None:
+    """[入力1, +/-, 入力2, %] の場合に左辺×右辺÷100 が計算されること"""
+    left, operator, display = resolve_percentage_operation(200.0, "add", "10")
+
+    assert left is None
+    assert operator is None
+    assert display == "220"
+
+
+def test_percentage_multiply_divide_rule() -> None:
+    """[入力1, x/, 入力2, %] の場合に右辺÷100 が計算されること"""
+    # multiply: 200 * (10/100) = 20
+    _, _, display_mul = resolve_percentage_operation(200.0, "multiply", "10")
+    assert display_mul == "20"
+
+    # divide: 200 / (10/100) = 2000
+    _, _, display_div = resolve_percentage_operation(200.0, "divide", "10")
+    assert display_div == "2000"
+
+
+def test_percentage_divide_by_zero_shows_error() -> None:
+    """[入力1, /, 0, %] で Error が表示されること"""
+    left, operator, display = resolve_percentage_operation(200.0, "divide", "0")
+
+    assert left is None
+    assert operator is None
+    assert display == "Error"
 
 
 def test_clear_button_resets_formula_result_and_operation_state() -> None:
