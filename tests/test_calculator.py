@@ -65,6 +65,13 @@ def test_subtraction_cases(left: float, right: float, expected: float) -> None:
         (1.5, 0, "add", 1.5),
         (1, 1.5, "add", 2.5),
         (1.5, 1, "add", 2.5),
+        (1.5, 2.5, "subtract", 4.0),
+        (1.5, -0.5, "subtract", 1.0),
+        (-1.5, 0.5, "subtract", -1.0),
+        (-1.5, -2.5, "subtract", -4.0),
+        (1.5, 0, "subtract", 1.5),
+        (1, 1.5, "subtract", 2.5),
+        (1.5, 1, "subtract", 2.5),
     ],
     ids=[
         "positive-decimal-plus-positive-decimal",
@@ -74,6 +81,13 @@ def test_subtraction_cases(left: float, right: float, expected: float) -> None:
         "positive-decimal-plus-zero",
         "integer-plus-positive-decimal",
         "positive-decimal-plus-integer",
+        "positive-decimal-minus-positive-decimal",
+        "positive-decimal-minus-negative-decimal",
+        "negative-decimal-minus-positive-decimal",
+        "negative-decimal-minus-negative-decimal",
+        "positive-decimal-minus-zero",
+        "integer-minus-positive-decimal",
+        "positive-decimal-minus-integer",
     ],
 )
 def test_decimal_cases(
